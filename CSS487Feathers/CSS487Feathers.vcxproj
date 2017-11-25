@@ -18,6 +18,17 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Feature Detection\HoNC.cpp" />
+    <ClCompile Include="src\Feature Detection\HoWH.cpp" />
+    <ClCompile Include="src\Feature Detection\VanillaSIFT.cpp" />
+    <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Feature Detection\HoNC.h" />
+    <ClInclude Include="src\Feature Detection\HoWH.h" />
+    <ClInclude Include="src\Feature Detection\VanillaSIFT.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{71DF4570-15C3-440F-8CDB-9A5BE31D6BB6}</ProjectGuid>
     <RootNamespace>CSS487Feathers</RootNamespace>
@@ -69,7 +80,7 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="OpenCV_Debug.props" />
+    <Import Project="OpenCV_Release.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -113,9 +124,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

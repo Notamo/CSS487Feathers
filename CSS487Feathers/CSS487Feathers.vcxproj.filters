@@ -13,10 +13,36 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Feature Detection">
+      <UniqueIdentifier>{6bdcd61b-f8b0-4cf5-b656-30ef62e9b99e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Feature Detection">
+      <UniqueIdentifier>{cdf4642b-a9c4-4e2f-b692-7ab30f60b04d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Feature Detection\HoNC.cpp">
+      <Filter>Source Files\Feature Detection</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Feature Detection\HoWH.cpp">
+      <Filter>Source Files\Feature Detection</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Feature Detection\VanillaSIFT.cpp">
+      <Filter>Source Files\Feature Detection</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Feature Detection\HoNC.h">
+      <Filter>Header Files\Feature Detection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Feature Detection\HoWH.h">
+      <Filter>Header Files\Feature Detection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Feature Detection\VanillaSIFT.h">
+      <Filter>Header Files\Feature Detection</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
