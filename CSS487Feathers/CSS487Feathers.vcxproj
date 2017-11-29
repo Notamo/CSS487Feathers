@@ -19,12 +19,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Feature Detection\HoNC.cpp" />
-    <ClCompile Include="src\Feature Detection\HoWH.cpp" />
-    <ClCompile Include="src\Feature Detection\VanillaSIFT.cpp" />
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="FeatherBOW.cpp" />
+    <ClCompile Include="FeatherDetector.cpp" />
+    <ClCompile Include="FeatureExtractor.cpp" />
+    <ClCompile Include="HoNC\HoNC.cpp" />
+    <ClCompile Include="HoNC\HoWH.cpp" />
+    <ClCompile Include="HoNC\VanillaSIFT.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FeatherBOW.h" />
+    <ClInclude Include="FeatherDetector.h" />
+    <ClInclude Include="FeatureExtractor.h" />
+    <ClInclude Include="HoNC\HoNC.h" />
+    <ClInclude Include="HoNC\HoWH.h" />
+    <ClInclude Include="HoNC\VanillaSIFT.h" />
     <ClInclude Include="src\Feature Detection\HoNC.h" />
     <ClInclude Include="src\Feature Detection\HoWH.h" />
     <ClInclude Include="src\Feature Detection\VanillaSIFT.h" />

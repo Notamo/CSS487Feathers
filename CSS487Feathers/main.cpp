@@ -5,7 +5,7 @@
 using namespace cv;
 using namespace cv::xfeatures2d;
 
-#include "Feature Detection\HoNC.h"
+#include "HoNC\HoNC.h"
 
 #include <iostream>
 using namespace std;
@@ -22,22 +22,27 @@ int main(int argc, char *argv[])
 
 	//Test use of SURF, SIFT, HoNC	
 	vector<KeyPoint> keypoints;
+	vector<Mat> descriptors;
+
 	for (int i = 0; i < 3; i++)
 	{
 		if (i == 0)
 		{
 			Ptr<SURF> surf = SURF::create();
-			surf->detect(img, keypoints);
+			//surf->detect(img, keypoints);
+			surf->detectAndCompute(img, noArray(), keypoints, descriptors, false);
 		}
 		else if (i == 1)
 		{
 			Ptr<SIFT> sift = SIFT::create();
-			sift->detect(img, keypoints);
+			//sift->detect(img, keypoints);
+			sift->detectAndCompute(img, noArray(), keypoints, descriptors, false);
 		}
 		else if (i == 2)
 		{
 			Ptr<HoNC> honc = HoNC::create();
-			(*honc)(img, noArray(), keypoints, noArray(), false);			//pulled from prof olson's code, need to examine more
+			//(*honc)(img, noArray(), keypoints, noArray(), false);			//pulled from prof olson's code, need to examine more
+			(*honc)(img, noArray(), keypoints, descriptors, false);
 		}
 
 		//I saw this in prof's code, it might help
