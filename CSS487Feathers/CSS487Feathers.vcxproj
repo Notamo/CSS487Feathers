@@ -20,7 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FeatherBOW.cpp" />
-    <ClCompile Include="FeatherDetector.cpp" />
+    <ClCompile Include="FeatherIdentifier.cpp" />
     <ClCompile Include="FeatureExtractor.cpp" />
     <ClCompile Include="HoNC\HoNC.cpp" />
     <ClCompile Include="HoNC\HoWH.cpp" />
@@ -29,7 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FeatherBOW.h" />
-    <ClInclude Include="FeatherDetector.h" />
+    <ClInclude Include="FeatherIdentifier.h" />
     <ClInclude Include="FeatureExtractor.h" />
     <ClInclude Include="HoNC\HoNC.h" />
     <ClInclude Include="HoNC\HoWH.h" />

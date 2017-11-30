@@ -34,14 +34,15 @@ public:
 	void SaveData();
 private:
 	ExtractType extrType = ExtractType::None;
+	bool trained = false;
+	int numWords = 10;
 	
-	//for generating a bag of words/histogram
+	//for generating a bag of words/histogram (one for each training image)
 	Ptr<BOWKMeansTrainer> bowTrainer;
-	int numClusters = 10;	//number of words in vocab
 	int numAttempts = 3;
 
 	//Support Vector Machine actually generates a way to predict
-	//using our GIANT histogram
+	//using our GIANT histograms
 	Ptr<SVM> svm;
 
 	
