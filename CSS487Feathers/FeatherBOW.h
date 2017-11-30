@@ -5,6 +5,7 @@ using namespace cv;
 using namespace ml;
 
 #include <string>
+#include <vector>
 using namespace std;
 
 #include "FeatureExtractor.h"
@@ -22,7 +23,8 @@ public:
 	FeatherBOW(ExtractType eType, int numWords, string name);
 	~FeatherBOW();
 
-	void Train();
+	//Creates the BOW, by training a set of Images
+	void Train(const vector<Mat> &inputImages);
 
 	//Tells the user how likely it is the input image falls under this category
 	float Predict(const Mat &input);

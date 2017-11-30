@@ -12,7 +12,7 @@ FeatherBOW::~FeatherBOW()
 {
 }
 
-void FeatherBOW::Train()
+void FeatherBOW::Train(const vector<Mat> &inputImages)
 {
 
 	//<for each entry in the training data>
