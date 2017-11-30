@@ -33,7 +33,7 @@ public:
 	void LoadData();
 	void SaveData();
 private:
-	ExtractType extrType = ExtractType::None;
+	ExtractType extrType = ExtractType::_None;
 	bool trained = false;
 	int numWords = 10;
 	

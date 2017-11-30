@@ -21,7 +21,7 @@ class works out the details of implementation on its own.
 
 typedef enum
 {
-	None,
+	_None,
 	_SIFT,
 	_SURF,
 	_HoNC

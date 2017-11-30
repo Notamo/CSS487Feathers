@@ -12,14 +12,16 @@ FeatherIdentifier::~FeatherIdentifier()
 {
 }
 
-void FeatherIdentifier::Run(const vector<Mat> &trainingData, const Mat &testData)
+bool FeatherIdentifier::Run(const string &dbFile, const string &inputFile)
 {
+	Mat img = imread(inputFile);	//this can fail! put in a check
+
 	switch (mMode)
 	{
 		case Train_And_ID:
 		{
 			TrainBOWs();
-			Identify(testData);
+			Identify(img);
 			break;
 		}
 		case Train_And_Save:
@@ -31,10 +33,12 @@ void FeatherIdentifier::Run(const vector<Mat> &trainingData, const Mat &testData
 		case Load_And_ID:
 		{
 			LoadBOWs();
-			Identify(testData);
+			Identify(img);
 			break;
 		}
 	}
+
+	return true;
 }
 
 
@@ -58,7 +62,18 @@ void FeatherIdentifier::Identify(const Mat &testData)
 
 }
 
-void FeatherIdentifier::ListResults(const Mat& testImg, vector<RatingPair> pairs)
+void FeatherIdentifier::ListResults(const Mat& testImg, const vector<RatingPair> &pairs)
 {
 
+
+
+	//Finally, show the image the user used to test
+	namedWindow("TestImg");
+	imshow("TestImg", testImg);
+	waitKey(0);
+}
+
+bool FeatherIdentifier::MakeTrainingSets(const string &dbFile, vector<TrainingSet> &sets)
+{
+	return false;
 }

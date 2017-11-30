@@ -1,10 +1,14 @@
 #pragma once
-#include <opencv2\features2d.hpp>
-using namespace cv;
-
 #include <string>
 #include <vector>
 using namespace std;
+
+#include <opencv2\core.hpp>
+#include <opencv2\features2d.hpp>
+#include <opencv2\highgui.hpp>
+#include <opencv2\imgproc.hpp>
+using namespace cv;
+
 
 #include "FeatherBOW.h"
 
@@ -18,31 +22,44 @@ typedef enum
 
 class FeatherIdentifier
 {
-public:
-	FeatherIdentifier(FIDMode mode);
-	~FeatherIdentifier();
-
-	void Run(const vector<Mat> &trainingData, const Mat &testData);
-
 private:
-	FIDMode mMode = None;
-	vector<FeatherBOW> BOWs;
+	//Utility (maybe put these structs outside the class?)
+	typedef struct
+	{
+		vector<Mat> images;
+		string name;
+	} TrainingSet;
 
-	void TrainBOWs();
-	void SaveBOWs();
-	void LoadBOWs();
-
-	void Identify(const Mat &testData);
-
-
-	//UI Assistance (display results of test)
 	typedef struct
 	{
 		FeatherBOW *BOW = nullptr;
 		float probability = 0.0f;
 	} RatingPair;
 
-	void ListResults(const Mat &testImg, vector<RatingPair> pairs);
+public:
+	FeatherIdentifier(FIDMode mode);
+	~FeatherIdentifier();
+
+	bool Run(const string &dbFile, const string &inputFile);
+
+private:
+	FIDMode mMode = FIDMode::None;
+	vector<FeatherBOW> BOWs;
+
+	//Core Functionality
+	void TrainBOWs();
+	void SaveBOWs();
+	void LoadBOWs();
+
+	void Identify(const Mat &testData);
+
+	//UI Assistance (display results of test)
+	void ListResults(const Mat &testImg, const vector<RatingPair> &pairs);
+
+
+
+
+	bool MakeTrainingSets(const string &dbFile, vector<TrainingSet> &sets);
 
 };
 

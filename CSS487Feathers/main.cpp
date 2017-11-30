@@ -3,28 +3,21 @@
 #include <iostream>
 using namespace std;
 
+#include <opencv2\core.hpp>
+using namespace cv;
+
 int main(int argc, char *argv[])
 {
-	//Mat img = imread("test.jpg");
-
-	if (!img.data)
-	{
-		cout << "Could not open test.jpg!" << endl;
-		return -1;
-	}
+	string dbFile, inputFile;
+	inputFile = argv[1];
+	dbFile = argv[2];
 
 	FeatherIdentifier FeatherID = FeatherIdentifier(FIDMode::Train_And_ID);
 
-		//I saw this in prof's code, it might help
-		//KeyPointsFilter::retainBest(keypoints, 1000);
+	if (!FeatherID.Run(dbFile, inputFile))
+		return -1;
 
-
-
-		namedWindow("keypoints");
-		imshow("keypoints", img_keypoints);
-		waitKey(0);
-	}
-
-	
+	//I saw this in prof's code, it might help
+	//KeyPointsFilter::retainBest(keypoints, 1000);
 	return 0;
 }
