@@ -29,13 +29,16 @@ public:
 	//Tells the user how likely it is the input image falls under this category
 	float Predict(const Mat &input);
 
+	string GetName() { return name; }
 	//STRETCH GOAL: load and save training state for faster detection
 	void LoadData();
 	void SaveData();
 private:
-	ExtractType extrType = ExtractType::_None;
-	bool trained = false;
+	ExtractType extrType = ExtractType::E_None;
 	int numWords = 10;
+	string name = "[no name]";
+	bool trained = false;
+	
 	
 	//for generating a bag of words/histogram (one for each training image)
 	Ptr<BOWKMeansTrainer> bowTrainer;

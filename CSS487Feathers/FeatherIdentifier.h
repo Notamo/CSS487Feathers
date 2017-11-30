@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <algorithm>
 #include <vector>
 using namespace std;
 
@@ -9,16 +10,13 @@ using namespace std;
 #include <opencv2\imgproc.hpp>
 using namespace cv;
 
-
 #include "FeatherBOW.h"
 
-typedef enum
+typedef struct
 {
-	None,
-	Train_And_ID,		//Start by just using this mode
-	Train_And_Save,
-	Load_And_ID
-} FIDMode;
+	string name;
+	float rating = 0.0f;
+} RatingPair;
 
 class FeatherIdentifier
 {
@@ -30,36 +28,26 @@ private:
 		string name;
 	} TrainingSet;
 
-	typedef struct
-	{
-		FeatherBOW *BOW = nullptr;
-		float probability = 0.0f;
-	} RatingPair;
-
 public:
-	FeatherIdentifier(FIDMode mode);
+	FeatherIdentifier();
 	~FeatherIdentifier();
 
-	bool Run(const string &dbFile, const string &inputFile);
+	bool TrainIdentifier(const string &trainingFile);
+	bool Identify(const string &testFile, vector<RatingPair> &ratings);
 
-private:
-	FIDMode mMode = FIDMode::None;
-	vector<FeatherBOW> BOWs;
-
-	//Core Functionality
-	void TrainBOWs();
-	void SaveBOWs();
-	void LoadBOWs();
-
-	void Identify(const Mat &testData);
+	bool SaveBOWs(const string &bowFile);
+	bool LoadBOWs(const string &bowFile);
 
 	//UI Assistance (display results of test)
-	void ListResults(const Mat &testImg, const vector<RatingPair> &pairs);
+	void ListResults(const vector<RatingPair> &pairs);
 
+private:
+	bool trained = false;
 
+	vector<Ptr<FeatherBOW>> BOWs;
 
-
-	bool MakeTrainingSets(const string &dbFile, vector<TrainingSet> &sets);
-
+	//Core Functionality
+	bool TrainBOWs(const vector<TrainingSet> &trainingSets, ExtractType eType, int numWords);
+	bool MakeTrainingSets(const string &trainingFile, vector<TrainingSet> &trainingSets, ExtractType &eType, int &numWords);
 };
 

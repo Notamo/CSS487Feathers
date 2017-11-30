@@ -21,10 +21,10 @@ class works out the details of implementation on its own.
 
 typedef enum
 {
-	_None,
-	_SIFT,
-	_SURF,
-	_HoNC
+	E_None,
+	E_SIFT,
+	E_SURF,
+	E_HoNC
 } ExtractType;
 
 class FeatureExtractor

@@ -19,17 +19,17 @@ void FeatureExtractor::ExtractFeatures(ExtractType type, const Mat& img, vector<
 {
 	switch (type)
 	{
-		case ExtractType::_SIFT:
+		case ExtractType::E_SIFT:
 		{
 			sift->detectAndCompute(img, noArray(), keypoints, descriptors, false);
 			break;
 		}
-		case ExtractType::_SURF:
+		case ExtractType::E_SURF:
 		{
 			surf->detectAndCompute(img, noArray(), keypoints, descriptors, false);
 			break;
 		}
-		case ExtractType::_HoNC:
+		case ExtractType::E_HoNC:
 		{
 			(*honc)(img, noArray(), keypoints, descriptors, false);
 			break;

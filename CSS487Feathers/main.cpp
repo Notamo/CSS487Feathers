@@ -8,14 +8,18 @@ using namespace cv;
 
 int main(int argc, char *argv[])
 {
-	string dbFile, inputFile;
+	string inputFile, trainingFile;
 	inputFile = argv[1];
-	dbFile = argv[2];
+	trainingFile = argv[2];
 
-	FeatherIdentifier FeatherID = FeatherIdentifier(FIDMode::Train_And_ID);
+	FeatherIdentifier FeatherID = FeatherIdentifier();
 
-	if (!FeatherID.Run(dbFile, inputFile))
-		return -1;
+	FeatherID.TrainIdentifier(trainingFile);
+
+	vector<RatingPair> ratings;
+	FeatherID.Identify(inputFile, ratings);
+
+	FeatherID.ListResults(ratings);
 
 	//I saw this in prof's code, it might help
 	//KeyPointsFilter::retainBest(keypoints, 1000);

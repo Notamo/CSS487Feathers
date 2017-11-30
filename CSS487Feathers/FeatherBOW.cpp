@@ -5,6 +5,8 @@
 FeatherBOW::FeatherBOW(ExtractType eType, int numWords, string name)
 {
 	extrType = eType;
+	this->numWords = numWords;
+	this->name = name;
 }
 
 
