@@ -2,8 +2,9 @@
 
 
 
-FeatherIdentifier::FeatherIdentifier()
+FeatherIdentifier::FeatherIdentifier(const string &workingDirectory)
 {
+	this->workingDirectory = workingDirectory;
 }
 
 
@@ -124,5 +125,98 @@ bool FeatherIdentifier::TrainBOWs(const vector<TrainingSet> &trainingSets, Extra
 //<set name>	<set size>	<directory>
 bool FeatherIdentifier::MakeTrainingSets(const string &trainingFile, vector<TrainingSet> &trainingSets, ExtractType &eType, int &numWords)
 {
-	return false;
+	//try to open the trainingFile
+	ifstream TF(workingDirectory + trainingFile);
+
+	if (!TF.is_open())
+	{
+		cerr << "Failed to open trainingFile! (" << workingDirectory + trainingFile << ")" << endl;
+		return false;
+	}
+
+	//read the first line, should be in the following format\:
+	//<SIFT | SURF | HoNC>	<TAB>	<# words>
+	string line;
+	stringstream ss;
+	if (getline(TF, line))
+	{
+		string methodStr;
+
+		ss << line;
+		ss >> methodStr >> numWords;
+
+		//convert the methodString into
+		eType = ExtractTypeFromString(methodStr);
+
+		if (eType == ExtractType::E_None)
+		{
+			cerr << "Invalid extract type!" << endl;
+			TF.close();
+			return false;
+		}
+
+		
+
+		if (numWords < MIN_FEATHER_WORDS)
+		{
+			cerr << "Invalid number of words!" << endl;
+			TF.close();
+			return false;
+		}
+	}
+	else
+	{
+		TF.close();
+		return false;
+	}
+
+
+	while (getline(TF, line))
+	{
+		TrainingSet TS;
+		string name;
+		int qty;
+		string subdir;
+
+		ss.clear();
+		ss << line;
+		ss >> name >> qty >> subdir;
+
+		
+		if (!BuildTrainingSet(subdir, name, qty, TS))
+		{
+			cerr << "Failed to build training set for \"" << name << "\"" << endl;
+			TF.close();
+			return false;
+		}
+
+		trainingSets.push_back(TS);
+	}
+
+	TF.close();
+	return true;
+}
+
+bool FeatherIdentifier::BuildTrainingSet(const string &subdir, const string &name, const int &qty, TrainingSet &set)
+{
+	cout << "Building Set: (" << name << " " << qty << " " << subdir << ")" << endl;
+	set.name = name;
+
+	for (int i = 0; i < qty; i++)
+	{
+		string file(workingDirectory + subdir + name + "_" + to_string(i) + ".jpg");
+
+		cout << "loading image \"" << file << "\"" << endl;
+		Mat m = imread(file);
+
+		if (m.data == nullptr)
+		{
+			cerr << "Could not open \"" << file << "\"!" << endl;
+			cerr << "Failed to build " << name << " set!" << endl;
+			return false;
+		}
+
+		set.images.push_back(m);
+	}
+	return true;
 }

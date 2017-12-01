@@ -27,6 +27,8 @@ typedef enum
 	E_HoNC
 } ExtractType;
 
+ExtractType ExtractTypeFromString(const string &str);
+
 class FeatureExtractor
 {
 public:
@@ -34,7 +36,7 @@ public:
 	~FeatureExtractor();
 
 	void ExtractFeatures(ExtractType type, const Mat& img, vector<KeyPoint> &keypoints, vector<Mat> &descriptors);
-
+	
 private:
 
 	Ptr<SIFT> sift;

@@ -9,6 +9,9 @@ using namespace ml;
 using namespace std;
 
 #include "FeatureExtractor.h"
+
+const int MIN_FEATHER_WORDS = 10;
+
 /*
 FeatherBOW
 Description:

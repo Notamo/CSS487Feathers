@@ -1,7 +1,8 @@
 #pragma once
 #include <string>
-#include <algorithm>
+#include <strstream>
 #include <vector>
+#include <fstream>
 using namespace std;
 
 #include <opencv2\core.hpp>
@@ -18,6 +19,7 @@ typedef struct
 	float rating = 0.0f;
 } RatingPair;
 
+
 class FeatherIdentifier
 {
 private:
@@ -29,7 +31,7 @@ private:
 	} TrainingSet;
 
 public:
-	FeatherIdentifier();
+	FeatherIdentifier(const string &workingDirectory);
 	~FeatherIdentifier();
 
 	bool TrainIdentifier(const string &trainingFile);
@@ -42,6 +44,7 @@ public:
 	void ListResults(const vector<RatingPair> &pairs);
 
 private:
+	string workingDirectory;
 	bool trained = false;
 
 	vector<Ptr<FeatherBOW>> BOWs;
@@ -49,5 +52,6 @@ private:
 	//Core Functionality
 	bool TrainBOWs(const vector<TrainingSet> &trainingSets, ExtractType eType, int numWords);
 	bool MakeTrainingSets(const string &trainingFile, vector<TrainingSet> &trainingSets, ExtractType &eType, int &numWords);
+	bool BuildTrainingSet(const string &directory, const string &prefix, const int &qty, TrainingSet &set);
 };
 

@@ -36,3 +36,23 @@ void FeatureExtractor::ExtractFeatures(ExtractType type, const Mat& img, vector<
 		}
 	}
 }
+
+ExtractType ExtractTypeFromString(const string &str)
+{
+	if (str == "SIFT")
+	{
+		return ExtractType::E_SURF;
+	}
+	else if (str == "SURF")
+	{
+		return ExtractType::E_SURF;
+	}
+	else if (str == "HoNC")
+	{
+		return ExtractType::E_HoNC;
+	}
+	else
+	{
+		return ExtractType::E_None;
+	}
+}
