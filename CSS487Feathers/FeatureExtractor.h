@@ -35,12 +35,16 @@ public:
 	FeatureExtractor();
 	~FeatureExtractor();
 
-	void ExtractFeatures(ExtractType type, const Mat& img, vector<KeyPoint> &keypoints, vector<Mat> &descriptors);
+	void ExtractFeatures(ExtractType type, const Mat& img, vector<KeyPoint> &keypoints, Mat &descriptors);
 	
 private:
 
 	Ptr<SIFT> sift;
 	Ptr<SURF> surf;
 	Ptr<HoNC> honc;
+
+	void RunSIFT(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors);
+	void RunSURF(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors);
+	void RunHoNC(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors);
 };
 

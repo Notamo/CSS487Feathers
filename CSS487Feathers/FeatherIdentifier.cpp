@@ -155,8 +155,6 @@ bool FeatherIdentifier::MakeTrainingSets(const string &trainingFile, vector<Trai
 			return false;
 		}
 
-		
-
 		if (numWords < MIN_FEATHER_WORDS)
 		{
 			cerr << "Invalid number of words!" << endl;

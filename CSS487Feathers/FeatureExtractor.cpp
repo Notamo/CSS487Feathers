@@ -15,33 +15,56 @@ FeatureExtractor::~FeatureExtractor()
 
 //extract features based on the algorithm chosen
 //later we might even combine them
-void FeatureExtractor::ExtractFeatures(ExtractType type, const Mat& img, vector<KeyPoint> &keypoints, vector<Mat> &descriptors)
+void FeatureExtractor::ExtractFeatures(ExtractType type, const Mat& img, vector<KeyPoint> &keypoints, Mat &descriptors)
 {
 	switch (type)
 	{
 		case ExtractType::E_SIFT:
 		{
-			sift->detectAndCompute(img, noArray(), keypoints, descriptors, false);
+			RunSIFT(img, keypoints, descriptors);
 			break;
 		}
 		case ExtractType::E_SURF:
 		{
-			surf->detectAndCompute(img, noArray(), keypoints, descriptors, false);
+			RunSURF(img, keypoints, descriptors);
 			break;
 		}
 		case ExtractType::E_HoNC:
 		{
-			(*honc)(img, noArray(), keypoints, descriptors, false);
+			RunHoNC(img, keypoints, descriptors);
 			break;
 		}
 	}
+}
+
+void FeatureExtractor::RunSIFT(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors)
+{
+	Mat greyImg;
+	cvtColor(img, greyImg, COLOR_BGR2GRAY);
+
+	sift->detect(img, keypoints);
+	sift->compute(greyImg, keypoints, descriptors);
+}
+
+void FeatureExtractor::RunSURF(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors)
+{
+	Mat greyImg;
+	cvtColor(img, greyImg, COLOR_BGR2GRAY);
+
+	surf->detect(img, keypoints);
+	surf->compute(greyImg, keypoints, descriptors);
+}
+
+void FeatureExtractor::RunHoNC(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors)
+{
+	(*honc)(img, noArray(), keypoints, descriptors, false);
 }
 
 ExtractType ExtractTypeFromString(const string &str)
 {
 	if (str == "SIFT")
 	{
-		return ExtractType::E_SURF;
+		return ExtractType::E_SIFT;
 	}
 	else if (str == "SURF")
 	{

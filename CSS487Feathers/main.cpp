@@ -42,7 +42,5 @@ int main(int argc, char *argv[])
 
 	FeatherID.ListResults(ratings);
 
-	//I saw this in prof's code, it might help
-	//KeyPointsFilter::retainBest(keypoints, 1000);
 	return 0;
 }
