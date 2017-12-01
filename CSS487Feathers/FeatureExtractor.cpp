@@ -37,6 +37,32 @@ void FeatureExtractor::ExtractFeatures(ExtractType type, const Mat& img, vector<
 	}
 }
 
+bool FeatureExtractor::GetExtractor(ExtractType type, Ptr<DescriptorExtractor> &extractor)
+{
+	switch (type)
+	{
+		case ExtractType::E_SIFT:
+		{
+			extractor = sift;
+			return true;
+		}
+		case ExtractType::E_SURF:
+		{
+			extractor = surf;
+			return true;
+		}
+		case ExtractType::E_HoNC:
+		{
+			extractor = honc;
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
 void FeatureExtractor::RunSIFT(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors)
 {
 	Mat greyImg;

@@ -37,6 +37,8 @@ public:
 
 	void ExtractFeatures(ExtractType type, const Mat& img, vector<KeyPoint> &keypoints, Mat &descriptors);
 	
+	bool GetExtractor(ExtractType type, Ptr<DescriptorExtractor> &extractor);
+
 private:
 
 	Ptr<SIFT> sift;

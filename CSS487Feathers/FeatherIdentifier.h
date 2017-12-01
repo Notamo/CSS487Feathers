@@ -23,10 +23,11 @@ typedef struct
 class FeatherIdentifier
 {
 private:
-	//Utility (maybe put these structs outside the class?)
+
 	typedef struct
 	{
 		vector<Mat> images;
+		Ptr<FeatherBOW> BOW;
 		string name;
 	} TrainingSet;
 
@@ -46,12 +47,18 @@ public:
 private:
 	string workingDirectory;
 	bool trained = false;
+	ExtractType eType = ExtractType::E_None;
 
+	//TRAINING SETS VECTOR GOES HERE
+	vector<TrainingSet> trainingSets;
 	vector<Ptr<FeatherBOW>> BOWs;
+	//The SVM (Support vector machine) classifies and predicts for us
+	Ptr<SVM> svm;
 
 	//Core Functionality
-	bool TrainBOWs(const vector<TrainingSet> &trainingSets, ExtractType eType, int numWords);
-	bool MakeTrainingSets(const string &trainingFile, vector<TrainingSet> &trainingSets, ExtractType &eType, int &numWords);
+	bool TrainBOWs(ExtractType eType, int numWords);
+	bool TrainSVM(ExtractType eType, int numWords);
+	bool MakeTrainingSets(const string &trainingFile, ExtractType &eType, int &numWords);
 	bool BuildTrainingSet(const string &directory, const string &prefix, const int &qty, TrainingSet &set);
 };
 

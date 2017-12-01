@@ -8,7 +8,11 @@ FeatherBOW::FeatherBOW(ExtractType eType, int numWords, string name)
 	this->numWords = numWords;
 	this->name = name;
 
-	bowTrainer = new BOWKMeansTrainer(numWords);
+	//termination criteria (figure out the details of this later
+	TermCriteria tc(CV_TERMCRIT_ITER, 100, 0.001);		//iterative, 100 iterations?
+	int retries = 1;
+	int flags = KMEANS_PP_CENTERS;			//how we get the centers for iteration 1
+	bowTrainer = new BOWKMeansTrainer(numWords, tc, 1, flags);
 }
 
 
@@ -16,11 +20,12 @@ FeatherBOW::~FeatherBOW()
 {
 }
 
-void FeatherBOW::Train(const vector<Mat> &inputImages)
+//use the input images to make a dictionary of features
+//for now use every image to make a dictionary
+void FeatherBOW::MakeDictionary(const vector<Mat> &inputImages)
 {
-	FeatureExtractor extractor;
-	
-	//<for each entry in the training data>
+	//3. Make the BOW dictionary
+	//<for each entry in the training data>					//apparently we don't usually use every image to make the dictionary
 	for (int i = 0; i < inputImages.size(); i++)
 	{
 		vector<KeyPoint> keypoints;
@@ -29,55 +34,74 @@ void FeatherBOW::Train(const vector<Mat> &inputImages)
 		//1. run the data through the feature extractor
 		extractor.ExtractFeatures(extrType, inputImages[i], keypoints, descriptors);
 
-		namedWindow("image");
-		imshow("image", inputImages[i]);
-		waitKey(0);
+		cout << "keypoints: " << keypoints.size() << endl;
+		cout << "descriptors.size(): " << descriptors.size() << endl;
 
-
-		Mat keypointImg;
-		drawKeypoints(inputImages[i], keypoints, keypointImg);
-		namedWindow("keypoints");
-		imshow("keypoints", keypointImg);
-		waitKey(0);
-
-
-		namedWindow("descriptor " + to_string(i));
-		imshow("descriptor " + to_string(i), descriptors);
-		waitKey(0);
-
-		cout << descriptors.size() << endl;
 		//2. put the features into the BOW Trainer
 		bowTrainer->add(descriptors);
 	}
 
-	//3. Make the BOW Histogram (dictionary)
-	Mat bowHistogram;
-	bowHistogram = bowTrainer->cluster();
+	cout << "Clustering " << bowTrainer->descriptorsCount() << " features" << endl;
 
-	namedWindow("histogram");
-	imshow("histogram", bowHistogram);
+	dictionary = bowTrainer->cluster();
+
+	cout << "dictionary size: " << dictionary.size() << endl;
+	namedWindow("dictionary");
+	imshow("dictionary", dictionary);
 	waitKey(0);
-
-	//3. Make the BOW histrogram
-	//BOWImgDescriptorExtractor bowDE(descriptors, mat)
-
-	//4. Add it to the SVM	
 }
 
-void FeatherBOW::LoadData()
+Mat FeatherBOW::GetDictionary()
 {
-
+	return dictionary;
 }
 
-void FeatherBOW::SaveData()
+int FeatherBOW::GetSize()
 {
-
+	return numWords;
 }
 
-float FeatherBOW::Predict(const Mat &input)
+
+//Computes an image histogram, according to the current BOW
+bool FeatherBOW::ComputeImgHist(const Mat &descriptors, Mat &hist)
 {
-	//1. run the input throught the feature extractor
-	//2. put the features through the BOW machine
-	//3. SVM.predict()
-	return 0.0f;
+	//hist = Mat(dictionary.rows, 1, CV_32FC1);
+	//hist = Mat(1, dictionary.rows, CV_32FC1);
+	hist = Mat_<float>(1, dictionary.rows);
+
+	for (int dicRow = 0; dicRow < dictionary.rows; dicRow++)
+	{
+		for (int descRow = 0; descRow < descriptors.rows; descRow++)
+		{
+			//check if the rows are equal
+			Mat diff;
+			compare(descriptors.row(descRow), dictionary.row(dicRow), diff, CMP_NE);
+			int nz = countNonZero(diff);
+			if (nz == 0)
+				hist.at<float>(dicRow) += 1.0f;
+		}
+	}
+
+	return true;
+}
+
+void FeatherBOW::LoadData(string directory)
+{
+	FileStorage fs(directory + name + "dictionary.yml", FileStorage::READ);
+	fs["vocabulary"] >> dictionary;
+	fs.release();
+	trained = true;
+}
+
+void FeatherBOW::SaveData(string directory)
+{
+	if (!trained)
+	{
+		cerr << name << "BOW not trained! Cannot save data!" << endl;
+		return;
+	}
+
+	FileStorage fs(directory + name + "dictionary.yml", FileStorage::WRITE);
+	fs << "vocabulary" << dictionary;
+	fs.release();
 }

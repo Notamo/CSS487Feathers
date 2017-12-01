@@ -36,11 +36,11 @@ int main(int argc, char *argv[])
 	if (!FeatherID.TrainIdentifier(trainingFile))
 		return -1;
 
-	vector<RatingPair> ratings;
+	/*vector<RatingPair> ratings;
 	if (!FeatherID.Identify(inputFile, ratings))
 		return -1;
 
-	FeatherID.ListResults(ratings);
+	FeatherID.ListResults(ratings);*/
 
 	return 0;
 }

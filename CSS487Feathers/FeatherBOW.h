@@ -27,29 +27,32 @@ public:
 	~FeatherBOW();
 
 	//Creates the BOW, by training a set of Images
-	void Train(const vector<Mat> &inputImages);
-
-	//Tells the user how likely it is the input image falls under this category
-	float Predict(const Mat &input);
+	void MakeDictionary(const vector<Mat> &inputImages);
+	Mat GetDictionary();
+	int GetSize();
 
 	string GetName() { return name; }
+
+	bool ComputeImgHist(const Mat &descriptors, Mat &hist);
+
 	//STRETCH GOAL: load and save training state for faster detection
-	void LoadData();
-	void SaveData();
+	void LoadData(string directory);
+	void SaveData(string directory);
+
 private:
+	FeatureExtractor extractor;
 	ExtractType extrType = ExtractType::E_None;
 	int numWords = 10;
 	string name = "[no name]";
 	bool trained = false;
-	
+
+	Mat dictionary;
 	
 	//for generating a bag of words/histogram (one for each training image)
 	Ptr<BOWKMeansTrainer> bowTrainer;
 	int numAttempts = 3;
 
-	//Support Vector Machine actually generates a way to predict
-	//using our GIANT histograms
-	Ptr<SVM> svm;
+	
 
 	
 };
