@@ -30,6 +30,7 @@
   <ItemGroup>
     <ClInclude Include="FeatherBOW.h" />
     <ClInclude Include="FeatherIdentifier.h" />
+    <ClInclude Include="FeatherIDUtil.h" />
     <ClInclude Include="FeatureExtractor.h" />
     <ClInclude Include="HoNC\HoNC.h" />
     <ClInclude Include="HoNC\HoWH.h" />

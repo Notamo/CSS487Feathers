@@ -4,10 +4,12 @@
 using namespace cv;
 using namespace ml;
 
+#include <iostream>
 #include <string>
 #include <vector>
 using namespace std;
 
+#include "FeatherIDUtil.h"
 #include "FeatureExtractor.h"
 
 const int MIN_FEATHER_WORDS = 10;
@@ -23,33 +25,33 @@ An input can be compared to the BOW to determine how likely it is in the set
 class FeatherBOW
 {
 public:
-	FeatherBOW(ExtractType eType, int numWords, string name);
+	FeatherBOW(ExtractType eType, int numWords);
 	~FeatherBOW();
 
 	//Creates the BOW, by training a set of Images
-	void MakeDictionary(const vector<Mat> &inputImages);
+	void MakeDictionary(const vector<TrainingSet> &trainingSets);
 	Mat GetDictionary();
 	int GetSize();
 
-	string GetName() { return name; }
-
-	bool ComputeImgHist(const Mat &descriptors, Mat &hist);
+	bool ComputeImgHist(const Mat &image, Mat &hist);
 
 	//STRETCH GOAL: load and save training state for faster detection
-	void LoadData(string directory);
-	void SaveData(string directory);
+	void LoadDictionary(string directory);
+	void SaveDictionary(string directory);
 
 private:
 	FeatureExtractor extractor;
 	ExtractType extrType = ExtractType::E_None;
+
 	int numWords = 10;
-	string name = "[no name]";
 	bool trained = false;
 
 	Mat dictionary;
-	
-	//for generating a bag of words/histogram (one for each training image)
+
+	Ptr<FeatureDetector> FD;
+	Ptr<DescriptorMatcher> DM;
 	Ptr<BOWKMeansTrainer> bowTrainer;
+	Ptr<BOWImgDescriptorExtractor> bowDE;
 	int numAttempts = 3;
 
 	

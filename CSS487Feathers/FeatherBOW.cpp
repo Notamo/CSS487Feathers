@@ -1,18 +1,38 @@
 #include "FeatherBOW.h"
 
+bool checkEqualRow(const Mat& mat1, const Mat& mat2)
+{
+	if (mat1.size() != mat2.size())
+	{
+		return false;
+	}
 
+	Mat dst;
+	bitwise_xor(mat1, mat2, dst);
+	if (countNonZero(dst) > 0)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
 
-FeatherBOW::FeatherBOW(ExtractType eType, int numWords, string name)
+FeatherBOW::FeatherBOW(ExtractType eType, int numWords)
 {
 	extrType = eType;
 	this->numWords = numWords;
-	this->name = name;
 
 	//termination criteria (figure out the details of this later
 	TermCriteria tc(CV_TERMCRIT_ITER, 100, 0.001);		//iterative, 100 iterations?
 	int retries = 1;
 	int flags = KMEANS_PP_CENTERS;			//how we get the centers for iteration 1
 	bowTrainer = new BOWKMeansTrainer(numWords, tc, 1, flags);
+
+	extractor.GetExtractor(eType, FD);
+	DM = DescriptorMatcher::create("FlannBased");
+	bowDE = new BOWImgDescriptorExtractor(FD, DM);
 }
 
 
@@ -22,33 +42,34 @@ FeatherBOW::~FeatherBOW()
 
 //use the input images to make a dictionary of features
 //for now use every image to make a dictionary
-void FeatherBOW::MakeDictionary(const vector<Mat> &inputImages)
+void FeatherBOW::MakeDictionary(const vector<TrainingSet> &trainingSets)
 {
-	//3. Make the BOW dictionary
-	//<for each entry in the training data>					//apparently we don't usually use every image to make the dictionary
-	for (int i = 0; i < inputImages.size(); i++)
+	//take every image and add it to a bag of words
+	for (int set = 0; set < trainingSets.size(); set++)
 	{
-		vector<KeyPoint> keypoints;
-		Mat descriptors;
+		cout << "adding \"/" << trainingSets[set].name << "\" to the BOW" << endl;
 
-		//1. run the data through the feature extractor
-		extractor.ExtractFeatures(extrType, inputImages[i], keypoints, descriptors);
+		for (int i = 0; i < trainingSets[set].images.size(); i++)
+		{
+			vector<KeyPoint> keypoints;
+			Mat descriptors;
 
-		cout << "keypoints: " << keypoints.size() << endl;
-		cout << "descriptors.size(): " << descriptors.size() << endl;
+			//1. run the image through the feature extractor
+			extractor.ExtractFeatures(extrType, trainingSets[set].images[i], keypoints, descriptors);
 
-		//2. put the features into the BOW Trainer
-		bowTrainer->add(descriptors);
+			//2. put the features into the BOW Trainer
+			bowTrainer->add(descriptors);
+		}
 	}
 
 	cout << "Clustering " << bowTrainer->descriptorsCount() << " features" << endl;
 
 	dictionary = bowTrainer->cluster();
 
-	cout << "dictionary size: " << dictionary.size() << endl;
-	namedWindow("dictionary");
-	imshow("dictionary", dictionary);
-	waitKey(0);
+	cout << "Setting bowDE vocabulary" << endl;
+	bowDE->setVocabulary(dictionary);
+
+	trained = true;
 }
 
 Mat FeatherBOW::GetDictionary()
@@ -63,45 +84,42 @@ int FeatherBOW::GetSize()
 
 
 //Computes an image histogram, according to the current BOW
-bool FeatherBOW::ComputeImgHist(const Mat &descriptors, Mat &hist)
+bool FeatherBOW::ComputeImgHist(const Mat &image, Mat &response_hist)
 {
-	//hist = Mat(dictionary.rows, 1, CV_32FC1);
-	//hist = Mat(1, dictionary.rows, CV_32FC1);
-	hist = Mat_<float>(1, dictionary.rows);
-
-	for (int dicRow = 0; dicRow < dictionary.rows; dicRow++)
+	if (trained == false)
 	{
-		for (int descRow = 0; descRow < descriptors.rows; descRow++)
-		{
-			//check if the rows are equal
-			Mat diff;
-			compare(descriptors.row(descRow), dictionary.row(dicRow), diff, CMP_NE);
-			int nz = countNonZero(diff);
-			if (nz == 0)
-				hist.at<float>(dicRow) += 1.0f;
-		}
+		cerr << "Cannot get histogram, No dictionary!" << endl;
+		return false;
 	}
+
+	vector<KeyPoint> keypoints;
+	Mat descriptors;
+	extractor.ExtractFeatures(extrType, image, keypoints, descriptors);
+
+	bowDE->compute(image, keypoints, response_hist);
 
 	return true;
 }
 
-void FeatherBOW::LoadData(string directory)
+void FeatherBOW::LoadDictionary(string directory)
 {
-	FileStorage fs(directory + name + "dictionary.yml", FileStorage::READ);
+	FileStorage fs(directory + "dictionary.yml", FileStorage::READ);
 	fs["vocabulary"] >> dictionary;
 	fs.release();
 	trained = true;
 }
 
-void FeatherBOW::SaveData(string directory)
+void FeatherBOW::SaveDictionary(string directory)
 {
 	if (!trained)
 	{
-		cerr << name << "BOW not trained! Cannot save data!" << endl;
+		cerr << "BOW not trained! Cannot save data!" << endl;
 		return;
 	}
 
-	FileStorage fs(directory + name + "dictionary.yml", FileStorage::WRITE);
+	FileStorage fs(directory + "dictionary.yml", FileStorage::WRITE);
 	fs << "vocabulary" << dictionary;
 	fs.release();
 }
+
+

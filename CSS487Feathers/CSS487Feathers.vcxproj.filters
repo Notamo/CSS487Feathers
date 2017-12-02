@@ -71,5 +71,8 @@
     <ClInclude Include="FeatherIdentifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FeatherIDUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

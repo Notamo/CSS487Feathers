@@ -29,7 +29,7 @@ bool FeatherIdentifier::TrainIdentifier(const string &trainingFile)
 		return false;
 	}
 
-	if (!TrainSVM(eType, numWords))
+	if (!TrainSVMs(eType, numWords))
 	{
 		cerr << "Failed to train SVM!" << endl;
 		return false;
@@ -54,64 +54,94 @@ bool FeatherIdentifier::TrainBOWs(ExtractType eType, int numWords)
 		return false;
 	}
 
-	//get all
-	for (int i = 0; i < trainingSets.size(); i++)
-	{
-		//make a new FeatherBOW
-		Ptr<FeatherBOW> BOW = new FeatherBOW(eType, numWords, trainingSets[i].name);
-		BOW->MakeDictionary(trainingSets[i].images);
-		BOWs.push_back(BOW);
-	}
-
+	BOW = new FeatherBOW(eType, numWords);
+	BOW->MakeDictionary(trainingSets);
 	return true;
 }
 
-bool FeatherIdentifier::TrainSVM(ExtractType eType, int numWords)
+bool FeatherIdentifier::TrainSVMs(ExtractType eType, int numWords)
 {
-	FeatureExtractor extractor;
-
-	Mat labels(0, 1, CV_32FC1);
-	Mat trainingData(0, numWords, CV_32FC1);
-
-	//for each category
+	//for each category, make the corresponding SVM
 	for (int i = 0; i < trainingSets.size(); i++)
 	{
-		//compute the histograms of each image's
-		//relationship with the dictionary of the category
-		for (int j = 0; j < trainingSets[i].images.size(); j++)
+		cout << endl << "Training SVM for training Set \"" << trainingSets[i].name << "\"" << endl;
+
+		if (!TrainSVM(i, numWords))
 		{
-			//For each image, make a histogram counting the instances of each word
-			//in the dictionary. Then, add that histogram to the svm
-			vector<KeyPoint> keypoints;
-			Mat descriptors;
-			Mat histogram;
-
-			extractor.ExtractFeatures(eType, trainingSets[i].images[j], keypoints, descriptors);
-
-			BOWs[i]->ComputeImgHist(descriptors, histogram);
-
-			cout << "descriptors size: " << descriptors.size() << endl;
-			cout << "hist size: " << histogram.size() << endl;
-
-			//add to our data
-			trainingData.push_back(histogram);
-			labels.push_back(i);
+			return false;
 		}
 	}
+	return true;
+}
 
-	cout << trainingData.size() << endl;
-	cout << labels.size() << endl;
 
-	svm = SVM::create();
+//Train One individual SVM
+//When training, add the correct categories with label values = 1
+//and add ALL the other categories with label values = 0
+bool FeatherIdentifier::TrainSVM(int index, int numWords)
+{
+	Mat trainingData(0, numWords, CV_32S);
+	Mat labels(0, 1, CV_32FC1);
+
+	//add the correct samples
+	for (int im = 0; im < trainingSets[index].images.size(); im++)
+	{
+		Mat bowDescriptor;
+		if (!BOW->ComputeImgHist(trainingSets[index].images[im], bowDescriptor))
+		{
+			cerr << "Cannot train SVM! Unable to compute histogram" << endl;
+			return false;
+		}
+
+		trainingData.push_back(bowDescriptor);
+	}
+	Mat class_label = Mat::ones(trainingSets[index].images.size(), 1, CV_32S);
+	labels.push_back(class_label);
+
+	//add all the others
+	for (int i = 0; i < trainingSets.size(); i++)
+	{
+		if (i == index) continue;
+
+		for (int im = 0; im < trainingSets[i].images.size(); im++)
+		{
+			Mat bowDescriptor;
+			if (!BOW->ComputeImgHist(trainingSets[i].images[im], bowDescriptor))
+			{
+				cerr << "Cannot train SVM! Unable to compute histogram" << endl;
+				return false;
+			}
+
+			//add to our data
+			trainingData.push_back(bowDescriptor);
+		}
+		Mat class_label = Mat::zeros(trainingSets[i].images.size(), 1, CV_32S);
+		labels.push_back(class_label);
+	}
+
+
+	for (int i = 0; i<labels.rows; i++)
+		for (int j = 0; j<labels.cols; j++)
+			printf("labels(%d, %d) = %d \n", i, j, labels.at<int>(i, j));
+
+	if (trainingData.rows == 0) return true;
+
+	//Finally, make the SVM
+	Ptr<SVM> svm = SVM::create();
 	svm->setType(SVM::C_SVC);
 	svm->setKernel(SVM::LINEAR);
 	svm->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER, 100, 1e-6));
 
-	svm->trainAuto(trainingData, ROW_SAMPLE, labels);
+	Ptr<TrainData> trainData = TrainData::create(trainingData, ROW_SAMPLE, labels);
+	svm->train(trainData);
+	SVMs.push_back(svm);
 
 	return true;
 }
 
+//basic idea:
+//look for the image's response histogram to the vocabulary of features
+//run it by all classifiers, and pick the one with the best score
 bool FeatherIdentifier::Identify(const string &testFile, vector<RatingPair> &ratings)
 {
 	if (!trained)
@@ -121,44 +151,30 @@ bool FeatherIdentifier::Identify(const string &testFile, vector<RatingPair> &rat
 	}
 
 	Mat testImg = imread(testFile);
+	Mat responseHist;
 
 	if (testImg.data == nullptr)
 	{
 		cerr << "Failed to open file!" << endl;
 		return false;
 	}
-
-	namedWindow("testImg");
-	imshow("testImg", testImg);
-	waitKey(0);
-
-	vector<KeyPoint> keypoints;
-	Mat descriptors;
-	FeatureExtractor extractor;
-	extractor.ExtractFeatures(eType, testImg, keypoints, descriptors);
-
 	
-	vector<Mat> histograms;
-	for (int i = 0; i < trainingSets.size(); i++)
+	//get the histogram for the input image
+	if (!BOW->ComputeImgHist(testImg, responseHist))
 	{
-		Mat newHist;
-		BOWs[i]->ComputeImgHist(descriptors, newHist);
-		histograms.push_back(newHist);
+		cerr << "Cannot compute histogram for test image!" << endl;
+		return false;
 	}
 
-	for (int i = 0; i < histograms.size(); i++)
+	for (int i = 0; i < SVMs.size(); i++)
 	{
-		float response = svm->predict(histograms[i]);
-		cout << "closest guess: " << response << endl;
+
+		float response = SVMs[i]->predict(responseHist);
+		
+		cout << "category: " << trainingSets[i].name << endl;
+		cout << "score: " << response << endl;
+
 	}
-
-
-
-	
-	
-	namedWindow("testImg");
-	imshow("testImg", testImg);
-	waitKey(0);
 
 	//Build a vector of RatingPairs, 
 	//based on the results of calling FeatherBOW.Predict

@@ -29,18 +29,18 @@ int main(int argc, char *argv[])
 		workingDirectory = "";
 	}
 
-
-
 	FeatherIdentifier FeatherID = FeatherIdentifier(workingDirectory);
 
 	if (!FeatherID.TrainIdentifier(trainingFile))
 		return -1;
 
-	/*vector<RatingPair> ratings;
+	vector<RatingPair> ratings;
 	if (!FeatherID.Identify(inputFile, ratings))
 		return -1;
 
-	FeatherID.ListResults(ratings);*/
+	//FeatherID.ListResults(ratings);
+
+	cin.get();
 
 	return 0;
 }
