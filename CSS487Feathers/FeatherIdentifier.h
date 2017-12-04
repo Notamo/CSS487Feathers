@@ -38,7 +38,7 @@ private:
 	vector<TrainingSet> trainingSets;
 	Ptr<FeatherBOW> BOW;
 	Ptr<BOWImgDescriptorExtractor> bowDE;
-	vector<Ptr<SVM>> SVMs;
+	Ptr<SVM> singleSVM;
 
 	//Core Functionality
 	bool TrainBOWs(ExtractType eType, int numWords);

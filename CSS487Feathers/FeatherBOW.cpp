@@ -1,24 +1,5 @@
 #include "FeatherBOW.h"
 
-bool checkEqualRow(const Mat& mat1, const Mat& mat2)
-{
-	if (mat1.size() != mat2.size())
-	{
-		return false;
-	}
-
-	Mat dst;
-	bitwise_xor(mat1, mat2, dst);
-	if (countNonZero(dst) > 0)
-	{
-		return false;
-	}
-	else
-	{
-		return true;
-	}
-}
-
 FeatherBOW::FeatherBOW(ExtractType eType, int numWords)
 {
 	extrType = eType;
@@ -30,9 +11,11 @@ FeatherBOW::FeatherBOW(ExtractType eType, int numWords)
 	int flags = KMEANS_PP_CENTERS;			//how we get the centers for iteration 1
 	bowTrainer = new BOWKMeansTrainer(numWords, tc, 1, flags);
 
-	extractor.GetExtractor(eType, FD);
-	DM = DescriptorMatcher::create("FlannBased");
-	bowDE = new BOWImgDescriptorExtractor(FD, DM);
+	
+	extr.GetExtractor(eType, detector);
+	extr.GetExtractor(eType, extractor);
+	matcher = DescriptorMatcher::create("FlannBased");
+	bowDE = new BOWImgDescriptorExtractor(extractor, matcher);
 }
 
 
@@ -55,7 +38,7 @@ void FeatherBOW::MakeDictionary(const vector<TrainingSet> &trainingSets)
 			Mat descriptors;
 
 			//1. run the image through the feature extractor
-			extractor.ExtractFeatures(extrType, trainingSets[set].images[i], keypoints, descriptors);
+			extr.ExtractFeatures(extrType, trainingSets[set].images[i], keypoints, descriptors);
 
 			//2. put the features into the BOW Trainer
 			bowTrainer->add(descriptors);
@@ -94,7 +77,7 @@ bool FeatherBOW::ComputeImgHist(const Mat &image, Mat &response_hist)
 
 	vector<KeyPoint> keypoints;
 	Mat descriptors;
-	extractor.ExtractFeatures(extrType, image, keypoints, descriptors);
+	extr.ExtractFeatures(extrType, image, keypoints, descriptors);
 
 	bowDE->compute(image, keypoints, response_hist);
 

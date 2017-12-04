@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 		inputFile = argv[1];
 		trainingFile = argv[2];
 	}
-	
+
 	if (argc >= 4)
 	{
 		workingDirectory = argv[3];
@@ -31,12 +31,12 @@ int main(int argc, char *argv[])
 
 	FeatherIdentifier FeatherID = FeatherIdentifier(workingDirectory);
 
-	if (!FeatherID.TrainIdentifier(trainingFile))
+	if (!FeatherID.Train(trainingFile))
 	{
 		system("pause");
 		return -1;
 	}
-
+/*
 	vector<RatingPair> ratings;
 	if (!FeatherID.Identify(inputFile, ratings))
 	{
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	//FeatherID.ListResults(ratings);
+	//FeatherID.ListResults(ratings);*/
 
 	cin.get();
 

@@ -40,7 +40,7 @@ public:
 	void SaveDictionary(string directory);
 
 private:
-	FeatureExtractor extractor;
+	FeatureExtractor extr;
 	ExtractType extrType = ExtractType::E_None;
 
 	int numWords = 10;
@@ -48,8 +48,9 @@ private:
 
 	Mat dictionary;
 
-	Ptr<FeatureDetector> FD;
-	Ptr<DescriptorMatcher> DM;
+	Ptr<FeatureDetector> detector;
+	Ptr<DescriptorExtractor> extractor;
+	Ptr<DescriptorMatcher> matcher;
 	Ptr<BOWKMeansTrainer> bowTrainer;
 	Ptr<BOWImgDescriptorExtractor> bowDE;
 	int numAttempts = 3;
