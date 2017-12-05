@@ -8,20 +8,24 @@ using namespace cv;
 
 int main(int argc, char *argv[])
 {
-	string testingFile, trainingFile, workingDirectory;
+	string mode;
+	string file1, file2, workingDirectory;
 
-	if (argc < 3)
+	if (argc < 4)
 		return -1;
 
-	if (argc >= 3)
-	{
-		trainingFile = argv[1];
-		testingFile = argv[2];
-	}
-	
+	//need to at least have a testing and training file
 	if (argc >= 4)
 	{
-		workingDirectory = argv[3];
+		mode = argv[1];
+		file1 = argv[2];		//these are used differently depending upon context
+		file2 = argv[3];
+	}
+	
+	//optional working directory argument
+	if (argc >= 5)
+	{
+		workingDirectory = argv[4];
 		workingDirectory += "/";
 	}
 	else
@@ -30,24 +34,69 @@ int main(int argc, char *argv[])
 	}
 
 	FeatherIdentifier FeatherID = FeatherIdentifier(workingDirectory);
-
 	bool verify = true;
-	if (!FeatherID.Train(trainingFile, verify))
-	{
-		system("pause");
-		return -1;
-	}
+
 	
-
-	if (!FeatherID.Identify(testingFile, true))
+	if (mode == "train+save")		//file1 = trainingFile, file2 = classifier
 	{
+		if (!FeatherID.Train(file1, verify))
+		{
+			cerr << "Failed to train Identifier!" << endl;
+			system("pause");
+			return -1;
+		}
+
+		if (!FeatherID.Save(file2))
+		{
+			cerr << "Failed to save Identifier!" << endl;
+			system("pause");
+			return -1;
+		}
+	}
+	else if (mode == "load+test")	//file1 = classifier, file2 = testing data
+	{
+		if (!FeatherID.Load(file1))
+		{
+			cerr << "Failed to load Identifier!" << endl;
+			system("pause");
+			return -1;
+		}
+
+		if (!FeatherID.Identify(file2, true))
+		{
+			cerr << "Identification Failed!" << endl;
+			system("pause");
+			return -1;
+		}
+
+	}
+	else if (mode == "train+test")	//file1 = training data, file2 = testing data
+	{
+
+		if (!FeatherID.Train(file1, verify))
+		{
+			cerr << "Failed to train Identifier!" << endl;
+			system("pause");
+			return -1;
+		}
+
+
+		if (!FeatherID.Identify(file2, true))
+		{
+			cerr << "Identification Failed!" << endl;
+			system("pause");
+			return -1;
+		}
+	}
+	else
+	{
+		cerr << "invalid mode!" << endl;
+		cerr << "you put \"" << 
 		system("pause");
 		return -1;
 	}
 
-	//FeatherID.ListResults(ratings);
-
-	cin.get();
-
+	cout << "Done" << endl;
+	system("pause");
 	return 0;
 }

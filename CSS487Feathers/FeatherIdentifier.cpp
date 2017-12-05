@@ -91,6 +91,32 @@ bool FeatherIdentifier::Identify(const string &testingFile, bool showImg)
 	return true;
 }
 
+bool FeatherIdentifier::Save(const string &saveName)
+{
+	if (!trained)
+	{
+		cerr << "No classifier to save!" << endl;
+		return false;
+	}
+
+	classifier->save(workingDirectory + saveName);
+	return true;
+}
+
+bool FeatherIdentifier::Load(const string &loadName)
+{
+	classifier = SVM::load(workingDirectory + loadName);
+
+	if (classifier == nullptr)
+	{
+		cerr << "Failed to load classifier! (" << (workingDirectory + loadName) << endl;
+		return false;
+	}
+
+	trained = true;
+	return true;
+}
+
 bool FeatherIdentifier::TestSVM(ExtractType eType, Ptr<FeatureDetector> &detector, Ptr<DescriptorExtractor> &extractor, vector<ImageSet> &sets, bool showImg)
 {
 	if (!trained)
@@ -242,8 +268,29 @@ bool FeatherIdentifier::MakeTestingSets(const string &testingFile)
 		return false;
 	}
 
+	//read the first line, should just have the extraction method
+	//<SIFT>
 	string line;
 	stringstream ss;
+	if (getline(TF, line))
+	{
+		string methodStr;
+
+		ss << line;
+		ss >> methodStr;
+
+		//convert the methodString into
+		if (!ExtractTypeFromString(methodStr, eType))
+		{
+			cerr << "Invalid Extract type!" << endl;
+			return false;
+		}
+	}
+	else
+	{
+		TF.close();
+		return false;
+	}
 
 	int label = 0;
 	while (getline(TF, line))
@@ -281,8 +328,6 @@ bool FeatherIdentifier::BuildImageSet(const string &subdir, const string &name, 
 	for (int i = 0; i < qty; i++)
 	{
 		string file(workingDirectory + subdir + name + "_" + to_string(i) + ".jpg");
-
-		cout << "loading image \"" << file << "\"" << endl;
 		Mat m = imread(file);
 
 		if (m.data == nullptr)
@@ -320,9 +365,7 @@ bool FeatherIdentifier::CreateVocabulary(Ptr<FeatureDetector> &detector, Ptr<Des
 		{
 			//first get the keypoints
 			vector<KeyPoint> keypoints;
-			cout << "det->det" << endl;
-			//detector->detect(trainingSets[set].images[im], keypoints);
-			FExtractor.Detect(eType, trainingSets[set].images[im], keypoints);
+			detector->detect(trainingSets[set].images[im], keypoints);
 
 			
 			if (!keypoints.empty())
@@ -335,14 +378,11 @@ bool FeatherIdentifier::CreateVocabulary(Ptr<FeatureDetector> &detector, Ptr<Des
 					//make a keypoint image
 					Mat keypointImg;
 					drawKeypoints(trainingSets[set].images[im], keypoints, keypointImg, Scalar(-1), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-					imwrite(trainingSets[set].name + "_HONCkeypoints.jpg", keypointImg);
+					imwrite(trainingSets[set].name + "_" + StringFromExtractType(eType) + "keypoints.bmp", keypointImg);
 				}
 
 				Mat descriptors;
-
-				cout << "ex->comp" << endl;
-				FExtractor.Compute(eType, trainingSets[set].images[im], keypoints, descriptors);
-				//extractor->compute(trainingSets[set].images[im], keypoints, descriptors);
+				extractor->compute(trainingSets[set].images[im], keypoints, descriptors);
 
 				if (!descriptors.empty())
 				{
@@ -363,9 +403,11 @@ bool FeatherIdentifier::CreateVocabulary(Ptr<FeatureDetector> &detector, Ptr<Des
 
 	//do the actual training to get a vocab
 	BOWKMeansTrainer trainer(numWords);
-	//BOWKMeansTrainer trainer(1000);
 	trainer.add(trainingDescriptors);
 	vocabulary = trainer.cluster();
+
+	//save an image of the vocabulary
+	imwrite(StringFromExtractType(eType) + to_string(numWords) + "_vocab.bmp", vocabulary);
 
 	cout << "Done!" << endl;
 	return true;

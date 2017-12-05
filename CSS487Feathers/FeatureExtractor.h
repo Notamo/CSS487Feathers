@@ -30,6 +30,7 @@ typedef enum
 } ExtractType;
 
 bool ExtractTypeFromString(const string &str, ExtractType &type);
+string StringFromExtractType(ExtractType type);
 
 class FeatureExtractor
 {

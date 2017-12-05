@@ -27,6 +27,9 @@ public:
 	bool Train(const string &trainingFile, bool verify);
 	bool Identify(const string &testFile, bool showImg);
 
+	bool Save(const string &saveName);
+	bool Load(const string &loadName);
+
 private:
 	string workingDirectory;
 

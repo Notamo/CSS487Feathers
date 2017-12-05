@@ -197,3 +197,18 @@ bool ExtractTypeFromString(const string &str, ExtractType &type)
 
 	return true;
 }
+
+string StringFromExtractType(ExtractType type)
+{
+	switch (type)
+	{
+	case ExtractType::E_SIFT:
+		return "SIFT";
+	case ExtractType::E_SURF:
+		return "SURF";
+	case ExtractType::E_HoNC:
+		return "HoNC";
+	case ExtractType::E_None:
+		return "NONE";
+	}
+}
