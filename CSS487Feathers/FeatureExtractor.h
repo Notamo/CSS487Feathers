@@ -37,8 +37,10 @@ public:
 	FeatureExtractor();
 	~FeatureExtractor();
 
+	void Detect(ExtractType type, const Mat& img, vector<KeyPoint> &keypoints);
+	void Compute(ExtractType type, const Mat& img, vector<KeyPoint> &keypoints, Mat &descriptors);
 	void ExtractFeatures(ExtractType type, const Mat& img, vector<KeyPoint> &keypoints, Mat &descriptors);
-
+	
 	bool FeatureExtractor::GetFD(ExtractType type, Ptr<FeatureDetector> &FD);
 	bool FeatureExtractor::GetDE(ExtractType type, Ptr<DescriptorExtractor> &DE);
 
@@ -48,8 +50,12 @@ private:
 	Ptr<SURF> surf;
 	Ptr<HoNC> honc;
 
-	void RunSIFT(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors);
-	void RunSURF(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors);
-	void RunHoNC(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors);
+	void DetectSIFT(const Mat &img, vector<KeyPoint> &keypoints);
+	void DetectSURF(const Mat &img, vector<KeyPoint> &keypoints);
+	void DetectHoNC(const Mat &img, vector<KeyPoint> &keypoints);
+
+	void ComputeSIFT(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors);
+	void ComputeSURF(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors);
+	void ComputeHoNC(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors);
 };
 

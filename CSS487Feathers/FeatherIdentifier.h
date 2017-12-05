@@ -24,14 +24,14 @@ public:
 	FeatherIdentifier(const string &workingDirectory);
 	~FeatherIdentifier();
 
-	bool Train(const string &trainingFile);
-	bool Identify(const string &testFile);
+	bool Train(const string &trainingFile, bool verify);
+	bool Identify(const string &testFile, bool showImg);
 
 private:
 	string workingDirectory;
 
 	//properties of the training state (cannot be cont
-	FeatureExtractor Extractor;
+	FeatureExtractor FExtractor;
 	ExtractType eType;
 	int numWords;
 
@@ -44,19 +44,15 @@ private:
 	vector<ImageSet> trainingSets;
 	vector<ImageSet> testingSets;
 
-	bool RunTestingSets(const vector<ImageSet> &testingSets);
-
 	bool MakeTrainingSets(const string &trainingFile, ExtractType &eType, int &numWords);
-	bool BuildTrainingSet(const string &subdir, const string &name, const int &label, const int &qty, ImageSet &trainingSet);
-
 	bool MakeTestingSets(const string &trainingFile);
-	bool BuildTestingSet(const string &subdir, const string &name, const int &label, const int &qty, ImageSet &testingSet);
+	bool BuildImageSet(const string &subdir, const string &name, const int &label, const int &qty, ImageSet &testingSet);
 
 
 	bool CreateVocabulary(Ptr<FeatureDetector> &FD, Ptr<DescriptorExtractor> &DE);
 	bool CalculateHistograms(Ptr<FeatureDetector> &FD, Ptr<DescriptorExtractor> &DE, Mat &outSamples, Mat &outLabels);
 	bool TrainSVM(const Mat &samples, const Mat &labels);
 
-	bool TestSVM(ExtractType eType, Ptr<FeatureDetector> &FD, Ptr<DescriptorExtractor> &DE, vector<ImageSet> &sets);
+	bool TestSVM(ExtractType eType, Ptr<FeatureDetector> &FD, Ptr<DescriptorExtractor> &DE, vector<ImageSet> &sets, bool showImg);
 };
 

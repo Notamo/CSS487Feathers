@@ -13,6 +13,50 @@ FeatureExtractor::~FeatureExtractor()
 {
 }
 
+void FeatureExtractor::Detect(ExtractType type, const Mat& img, vector<KeyPoint> &keypoints)
+{
+	switch (type)
+	{
+		case ExtractType::E_SIFT:
+		{
+			DetectSIFT(img, keypoints);
+			break;
+		}
+		case ExtractType::E_SURF:
+		{
+			DetectSURF(img, keypoints);
+			break;
+		}
+		case ExtractType::E_HoNC:
+		{
+			DetectHoNC(img, keypoints);
+			break;
+		}
+	}
+}
+
+void FeatureExtractor::Compute(ExtractType type, const Mat& img, vector<KeyPoint> &keypoints, Mat &descriptors)
+{
+	switch (type)
+	{
+		case ExtractType::E_SIFT:
+		{
+			ComputeSIFT(img, keypoints, descriptors);
+			break;
+		}
+		case ExtractType::E_SURF:
+		{
+			ComputeSURF(img, keypoints, descriptors);
+			break;
+		}
+		case ExtractType::E_HoNC:
+		{
+			ComputeHoNC(img, keypoints, descriptors);
+			break;
+		}
+	}
+}
+
 //extract features based on the algorithm chosen
 //later we might even combine them
 void FeatureExtractor::ExtractFeatures(ExtractType type, const Mat& img, vector<KeyPoint> &keypoints, Mat &descriptors)
@@ -21,41 +65,65 @@ void FeatureExtractor::ExtractFeatures(ExtractType type, const Mat& img, vector<
 	{
 		case ExtractType::E_SIFT:
 		{
-			RunSIFT(img, keypoints, descriptors);
+			DetectSIFT(img, keypoints);
+			ComputeSIFT(img, keypoints, descriptors);
 			break;
 		}
 		case ExtractType::E_SURF:
 		{
-			RunSURF(img, keypoints, descriptors);
+			DetectSURF(img, keypoints);
+			ComputeSURF(img, keypoints, descriptors);
 			break;
 		}
 		case ExtractType::E_HoNC:
 		{
-			RunHoNC(img, keypoints, descriptors);
+			DetectHoNC(img, keypoints);
+			ComputeHoNC(img, keypoints, descriptors);
 			break;
 		}
 	}
 }
 
-void FeatureExtractor::RunSIFT(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors)
+void FeatureExtractor::DetectSIFT(const Mat &img, vector<KeyPoint> &keypoints)
 {
 	Mat greyImg;
 	cvtColor(img, greyImg, COLOR_BGR2GRAY);
 
 	sift->detect(img, keypoints);
-	sift->compute(greyImg, keypoints, descriptors);
 }
 
-void FeatureExtractor::RunSURF(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors)
+void FeatureExtractor::DetectSURF(const Mat &img, vector<KeyPoint> &keypoints)
 {
 	Mat greyImg;
 	cvtColor(img, greyImg, COLOR_BGR2GRAY);
 
 	surf->detect(img, keypoints);
+}
+
+void FeatureExtractor::DetectHoNC(const Mat &img, vector<KeyPoint> &keypoints)
+{
+	(*honc)(img, noArray(), keypoints, noArray(), false);
+}
+
+
+
+void FeatureExtractor::ComputeSIFT(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors)
+{
+	Mat greyImg;
+	cvtColor(img, greyImg, COLOR_BGR2GRAY);
+
+	sift->compute(greyImg, keypoints, descriptors);
+}
+
+void FeatureExtractor::ComputeSURF(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors)
+{
+	Mat greyImg;
+	cvtColor(img, greyImg, COLOR_BGR2GRAY);
+
 	surf->compute(greyImg, keypoints, descriptors);
 }
 
-void FeatureExtractor::RunHoNC(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors)
+void FeatureExtractor::ComputeHoNC(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors)
 {
 	(*honc)(img, noArray(), keypoints, descriptors, false);
 }

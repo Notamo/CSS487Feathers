@@ -15,8 +15,8 @@ int main(int argc, char *argv[])
 
 	if (argc >= 3)
 	{
-		testingFile = argv[1];
-		trainingFile = argv[2];
+		trainingFile = argv[1];
+		testingFile = argv[2];
 	}
 	
 	if (argc >= 4)
@@ -31,17 +31,19 @@ int main(int argc, char *argv[])
 
 	FeatherIdentifier FeatherID = FeatherIdentifier(workingDirectory);
 
-	if (!FeatherID.Train(trainingFile))
+	bool verify = true;
+	if (!FeatherID.Train(trainingFile, verify))
 	{
 		system("pause");
 		return -1;
 	}
+	
 
-	/*if (!FeatherID.Identify(inputFile))
+	if (!FeatherID.Identify(testingFile, true))
 	{
 		system("pause");
 		return -1;
-	}*/
+	}
 
 	//FeatherID.ListResults(ratings);
 
