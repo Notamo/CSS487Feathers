@@ -6,6 +6,7 @@
 #include <opencv2/highgui.hpp>
 #include "HoNC\HoNC.h"
 
+#include "FeatherIDUtil.h"
 
 #include <vector>
 using namespace std;
@@ -19,6 +20,7 @@ of an image. The user simply picks an extraction algorithm, and the
 class works out the details of implementation on its own.
 */
 
+//Extraction methods
 typedef enum
 {
 	E_None,
@@ -27,7 +29,7 @@ typedef enum
 	E_HoNC
 } ExtractType;
 
-ExtractType ExtractTypeFromString(const string &str);
+bool ExtractTypeFromString(const string &str, ExtractType &type);
 
 class FeatureExtractor
 {
@@ -36,8 +38,9 @@ public:
 	~FeatureExtractor();
 
 	void ExtractFeatures(ExtractType type, const Mat& img, vector<KeyPoint> &keypoints, Mat &descriptors);
-	
-	bool GetExtractor(ExtractType type, Ptr<DescriptorExtractor> &extractor);
+
+	bool FeatureExtractor::GetFD(ExtractType type, Ptr<FeatureDetector> &FD);
+	bool FeatureExtractor::GetDE(ExtractType type, Ptr<DescriptorExtractor> &DE);
 
 private:
 

@@ -8,14 +8,14 @@ using namespace cv;
 
 int main(int argc, char *argv[])
 {
-	string inputFile, trainingFile, workingDirectory;
+	string testingFile, trainingFile, workingDirectory;
 
 	if (argc < 3)
 		return -1;
 
 	if (argc >= 3)
 	{
-		inputFile = argv[1];
+		testingFile = argv[1];
 		trainingFile = argv[2];
 	}
 	
@@ -31,18 +31,17 @@ int main(int argc, char *argv[])
 
 	FeatherIdentifier FeatherID = FeatherIdentifier(workingDirectory);
 
-	if (!FeatherID.TrainIdentifier(trainingFile))
+	if (!FeatherID.Train(trainingFile))
 	{
 		system("pause");
 		return -1;
 	}
 
-	vector<RatingPair> ratings;
-	if (!FeatherID.Identify(inputFile, ratings))
+	/*if (!FeatherID.Identify(inputFile))
 	{
 		system("pause");
 		return -1;
-	}
+	}*/
 
 	//FeatherID.ListResults(ratings);
 

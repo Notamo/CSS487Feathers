@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FeatherBOW.cpp" />
     <ClCompile Include="FeatherIdentifier.cpp" />
     <ClCompile Include="FeatureExtractor.cpp" />
     <ClCompile Include="HoNC\HoNC.cpp" />
@@ -28,7 +27,6 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FeatherBOW.h" />
     <ClInclude Include="FeatherIdentifier.h" />
     <ClInclude Include="FeatherIDUtil.h" />
     <ClInclude Include="FeatureExtractor.h" />

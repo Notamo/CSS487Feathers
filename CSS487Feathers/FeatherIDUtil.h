@@ -7,6 +7,8 @@ using namespace std;
 #include <opencv2\core.hpp>
 using namespace cv;
 
+const int MIN_FEATHER_WORDS = 10;
+
 typedef struct
 {
 	string name;
@@ -17,4 +19,6 @@ typedef struct
 {
 	vector<Mat> images;
 	string name;
-} TrainingSet;
+	int label;
+} ImageSet;
+

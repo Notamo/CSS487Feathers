@@ -24,9 +24,6 @@
     <ClCompile Include="FeatureExtractor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FeatherBOW.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -47,9 +44,6 @@
     <ClInclude Include="FeatureExtractor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FeatherBOW.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Feature Detection\HoNC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -68,10 +62,10 @@
     <ClInclude Include="HoNC\VanillaSIFT.h">
       <Filter>Header Files\HoNC</Filter>
     </ClInclude>
-    <ClInclude Include="FeatherIdentifier.h">
+    <ClInclude Include="FeatherIDUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FeatherIDUtil.h">
+    <ClInclude Include="FeatherIdentifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

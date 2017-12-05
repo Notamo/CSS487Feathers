@@ -7,13 +7,16 @@ using namespace std;
 
 #include <opencv2\core.hpp>
 #include <opencv2\features2d.hpp>
+#include <opencv2\xfeatures2d.hpp>
 #include <opencv2\highgui.hpp>
 #include <opencv2\imgproc.hpp>
+#include <opencv2\ml.hpp>
 using namespace cv;
+using namespace cv::xfeatures2d;
+using namespace cv::ml;
 
 #include "FeatherIDUtil.h"
-#include "FeatherBOW.h"
-
+#include "FeatureExtractor.h"
 
 class FeatherIdentifier
 {
@@ -21,30 +24,39 @@ public:
 	FeatherIdentifier(const string &workingDirectory);
 	~FeatherIdentifier();
 
-	bool TrainIdentifier(const string &trainingFile);
-	bool Identify(const string &testFile, vector<RatingPair> &ratings);
-
-	bool SaveBOWs(const string &bowFile);
-	bool LoadBOWs(const string &bowFile);
-
-	//UI Assistance (display results of test)
-	void ListResults(const vector<RatingPair> &pairs);
+	bool Train(const string &trainingFile);
+	bool Identify(const string &testFile);
 
 private:
 	string workingDirectory;
+
+	//properties of the training state (cannot be cont
+	FeatureExtractor Extractor;
+	ExtractType eType;
+	int numWords;
+
+	Mat vocabulary;
+	Mat histograms;
+	Mat labels;
+	Ptr<SVM> classifier;
 	bool trained = false;
-	ExtractType eType = ExtractType::E_None;
 
-	vector<TrainingSet> trainingSets;
-	Ptr<FeatherBOW> BOW;
-	Ptr<BOWImgDescriptorExtractor> bowDE;
-	Ptr<SVM> singleSVM;
+	vector<ImageSet> trainingSets;
+	vector<ImageSet> testingSets;
 
-	//Core Functionality
-	bool TrainBOWs(ExtractType eType, int numWords);
-	bool TrainSVMs(ExtractType eType, int numWords);
-	bool TrainSVM(int index, int numWords);
+	bool RunTestingSets(const vector<ImageSet> &testingSets);
+
 	bool MakeTrainingSets(const string &trainingFile, ExtractType &eType, int &numWords);
-	bool BuildTrainingSet(const string &directory, const string &prefix, const int &qty, TrainingSet &set);
+	bool BuildTrainingSet(const string &subdir, const string &name, const int &label, const int &qty, ImageSet &trainingSet);
+
+	bool MakeTestingSets(const string &trainingFile);
+	bool BuildTestingSet(const string &subdir, const string &name, const int &label, const int &qty, ImageSet &testingSet);
+
+
+	bool CreateVocabulary(Ptr<FeatureDetector> &FD, Ptr<DescriptorExtractor> &DE);
+	bool CalculateHistograms(Ptr<FeatureDetector> &FD, Ptr<DescriptorExtractor> &DE, Mat &outSamples, Mat &outLabels);
+	bool TrainSVM(const Mat &samples, const Mat &labels);
+
+	bool TestSVM(ExtractType eType, Ptr<FeatureDetector> &FD, Ptr<DescriptorExtractor> &DE, vector<ImageSet> &sets);
 };
 

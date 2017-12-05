@@ -37,32 +37,6 @@ void FeatureExtractor::ExtractFeatures(ExtractType type, const Mat& img, vector<
 	}
 }
 
-bool FeatureExtractor::GetExtractor(ExtractType type, Ptr<DescriptorExtractor> &extractor)
-{
-	switch (type)
-	{
-		case ExtractType::E_SIFT:
-		{
-			extractor = sift;
-			return true;
-		}
-		case ExtractType::E_SURF:
-		{
-			extractor = surf;
-			return true;
-		}
-		case ExtractType::E_HoNC:
-		{
-			extractor = honc;
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
-
 void FeatureExtractor::RunSIFT(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors)
 {
 	Mat greyImg;
@@ -86,22 +60,72 @@ void FeatureExtractor::RunHoNC(const Mat &img, vector<KeyPoint> &keypoints, Mat 
 	(*honc)(img, noArray(), keypoints, descriptors, false);
 }
 
-ExtractType ExtractTypeFromString(const string &str)
+bool FeatureExtractor::GetFD(ExtractType type, Ptr<FeatureDetector> &FD)
+{
+	switch (type)
+	{
+		case ExtractType::E_SIFT:
+		{
+			FD = sift;
+			return true;
+		}
+		case ExtractType::E_SURF:
+		{
+			FD = surf;
+			return true;
+		}
+		case ExtractType::E_HoNC:
+		{
+			FD = honc;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool FeatureExtractor::GetDE(ExtractType type, Ptr<DescriptorExtractor> &DE)
+{
+	switch (type)
+	{
+		case ExtractType::E_SIFT:
+		{
+			DE = sift;
+			return true;
+		}
+		case ExtractType::E_SURF:
+		{
+			DE = surf;
+			return true;
+		}
+		case ExtractType::E_HoNC:
+		{
+			DE = honc;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool ExtractTypeFromString(const string &str, ExtractType &type)
 {
 	if (str == "SIFT")
 	{
-		return ExtractType::E_SIFT;
+		type =  ExtractType::E_SIFT;
 	}
 	else if (str == "SURF")
 	{
-		return ExtractType::E_SURF;
+		type = ExtractType::E_SURF;
 	}
 	else if (str == "HoNC")
 	{
-		return ExtractType::E_HoNC;
+		type = ExtractType::E_HoNC;
 	}
 	else
 	{
-		return ExtractType::E_None;
+		return false;
 	}
+
+	return true;
 }
