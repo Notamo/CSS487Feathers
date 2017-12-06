@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 	
 	if (mode == "train+save")		//file1 = trainingFile, file2 = classifier
 	{
-		if (!FeatherID.Train(file1, verify))
+		if (!FeatherID.Train(file1, verify, false))
 		{
 			cerr << "Failed to train Identifier!" << endl;
 			system("pause");
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 			return -1;
 		}
 
-		if (!FeatherID.Identify(file2, true))
+		if (!FeatherID.Identify(file2, false, false))
 		{
 			cerr << "Identification Failed!" << endl;
 			system("pause");
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 	else if (mode == "train+test")	//file1 = training data, file2 = testing data
 	{
 
-		if (!FeatherID.Train(file1, verify))
+		if (!FeatherID.Train(file1, verify, false))
 		{
 			cerr << "Failed to train Identifier!" << endl;
 			system("pause");
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 		}
 
 
-		if (!FeatherID.Identify(file2, true))
+		if (!FeatherID.Identify(file2, false, false))
 		{
 			cerr << "Identification Failed!" << endl;
 			system("pause");
@@ -91,12 +91,11 @@ int main(int argc, char *argv[])
 	else
 	{
 		cerr << "invalid mode!" << endl;
-		cerr << "you put \"" << 
+		cerr << "you put \"" << mode << "\"" << endl;
 		system("pause");
 		return -1;
 	}
 
-	cout << "Done" << endl;
 	system("pause");
 	return 0;
 }

@@ -8,6 +8,7 @@ using namespace std;
 using namespace cv;
 
 const int MIN_FEATHER_WORDS = 10;
+const int MAX_KEYPOINTS = 1000;
 
 typedef struct
 {
@@ -21,4 +22,3 @@ typedef struct
 	string name;
 	int label;
 } ImageSet;
-

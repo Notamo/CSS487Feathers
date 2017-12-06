@@ -13,7 +13,7 @@ FeatherIdentifier::~FeatherIdentifier()
 }
 
 
-bool FeatherIdentifier::Train(const string &trainingFile, bool verify)
+bool FeatherIdentifier::Train(const string &trainingFile, bool verify, bool verbose)
 {
 	eType = ExtractType::E_None;
 	numWords = -1;
@@ -29,21 +29,21 @@ bool FeatherIdentifier::Train(const string &trainingFile, bool verify)
 	FExtractor.GetDE(eType, detector);
 	FExtractor.GetFD(eType, extractor);
 
-	cout << "Creating Vocabulary" << endl;
+	cout << endl << "Creating Vocabulary" << endl;
 	if (!CreateVocabulary(detector, extractor))
 	{
 		cerr << "Failed to create vocabulary!" << endl;
 		return false;
 	}
 
-	cout << "Calculating Histograms" << endl;
+	cout << endl << "Calculating Histograms" << endl;
 	if (!CalculateHistograms(detector, extractor, histograms, labels))
 	{
 		cerr << "Failed to create histograms!" << endl;
 		return false;
 	}
 
-	cout << "Training the SVM" << endl;
+	cout << endl << "Training the SVM" << endl;
 	if (!TrainSVM(histograms, labels))
 	{
 		cerr << "Failed to train SVM!" << endl;
@@ -54,19 +54,20 @@ bool FeatherIdentifier::Train(const string &trainingFile, bool verify)
 	cout << "Training Complete!" << endl;
 	trained = true;
 
-	cout << "Testing SVM with training data" << endl;
+	cout << endl << "Testing SVM with training data" << endl << endl;
 
 	if(verify)
-		TestSVM(eType, detector, extractor, trainingSets, false);
+		TestSVM(eType, detector, extractor, trainingSets, trainingSets, false, true);		//test the training set against itself
 
 	return true;
 }
 
-bool FeatherIdentifier::Identify(const string &testingFile, bool showImg)
+bool FeatherIdentifier::Identify(const string &testingFile, bool showImg, bool verbose)
 {
 	Ptr<FeatureDetector> detector;
 	Ptr<DescriptorExtractor> extractor;
 
+	cout << endl << "Identifying!" << endl; 
 	if (!trained)
 	{
 		cerr << "Cannot Identify, no training data!" << endl;
@@ -82,7 +83,7 @@ bool FeatherIdentifier::Identify(const string &testingFile, bool showImg)
 	FExtractor.GetDE(eType, detector);
 	FExtractor.GetFD(eType, extractor);
 
-	if (!TestSVM(eType, detector, extractor, testingSets, showImg))
+	if (!TestSVM(eType, detector, extractor, trainingSets, testingSets, showImg, verbose))
 	{
 		cerr << "SVM Test failed!" << endl;
 		return false;
@@ -117,7 +118,7 @@ bool FeatherIdentifier::Load(const string &loadName)
 	return true;
 }
 
-bool FeatherIdentifier::TestSVM(ExtractType eType, Ptr<FeatureDetector> &detector, Ptr<DescriptorExtractor> &extractor, vector<ImageSet> &sets, bool showImg)
+bool FeatherIdentifier::TestSVM(ExtractType eType, Ptr<FeatureDetector> &detector, Ptr<DescriptorExtractor> &extractor, vector<ImageSet> &trainSets, vector<ImageSet> &testSets, bool showImg, bool verbose)
 {
 	if (!trained)
 	{
@@ -125,21 +126,22 @@ bool FeatherIdentifier::TestSVM(ExtractType eType, Ptr<FeatureDetector> &detecto
 		return false;
 	}
 
-
 	Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create("BruteForce");		//combine with data from training
 
 
 	BOWImgDescriptorExtractor BOWide(extractor, matcher);
 	BOWide.setVocabulary(vocabulary);
 	
-	for (int set = 0; set < sets.size(); set++)
+	for (int set = 0; set < testSets.size(); set++)
 	{
-		int successful = 0;
+		cout << "Category: " << testSets[set].name << endl;
 
-		for (int im = 0; im < sets[set].images.size(); im++)
+		int successful = 0;
+		for (int im = 0; im < testSets[set].images.size(); im++)
 		{
 			vector<KeyPoint> keypoints;
-			detector->detect(sets[set].images[im], keypoints);
+			detector->detect(testSets[set].images[im], keypoints);
+			KeyPointsFilter::retainBest(keypoints, MAX_KEYPOINTS);
 
 			if (keypoints.empty())
 			{
@@ -148,7 +150,7 @@ bool FeatherIdentifier::TestSVM(ExtractType eType, Ptr<FeatureDetector> &detecto
 			}
 
 			Mat descriptor;
-			BOWide.compute(sets[set].images[im], keypoints, descriptor);
+			BOWide.compute(testSets[set].images[im], keypoints, descriptor);
 
 			if (descriptor.empty())
 			{
@@ -159,27 +161,37 @@ bool FeatherIdentifier::TestSVM(ExtractType eType, Ptr<FeatureDetector> &detecto
 			Mat results;
 			float res = classifier->predict(descriptor);
 
-			string predicted = sets[(int)res].name;
+			string predicted = trainSets[(int)res].name;
+			string truth = testSets[set].name;
 
-			cout << "prediction: " << predicted << " (" << res << ")" << endl;
-			cout << "Truth: " << sets[set].name << endl;
-
-			if ((int)res == set)
+			if (predicted == truth)
 				successful++;
+
+			if (verbose)
+			{
+				if (predicted == truth)
+				{
+					//cout << " Match!" << endl;
+				}
+				else
+				{
+					//cout << "prediction: " << predicted << " (" << res << ") ";
+					//cout << "Truth: " << truth << " (" << res << ")";
+					//cout << endl;
+				}
+			}
+
 
 			if (showImg)
 			{
-				imshow(predicted, sets[set].images[im]);
+				imshow(predicted, testSets[set].images[im]);
 				waitKey(0);
 				destroyWindow(predicted);
 			}
 		}
-
-		cout << "Category: " << sets[set].name << endl;
-		cout << "results: " << successful << "/" << sets[set].images.size() << " successful matches" << endl;
+		cout << "results: " << successful << "/" << testSets[set].images.size() << " successful matches" << endl;
 	}
 
-	cout << "Done Testing!" << endl;
 	return true;
 }
 
@@ -190,9 +202,9 @@ bool FeatherIdentifier::TestSVM(ExtractType eType, Ptr<FeatureDetector> &detecto
 //<set name>	<set size>	<directory>
 bool FeatherIdentifier::MakeTrainingSets(const string &trainingFile, ExtractType &eType, int &numWords)
 {
+	cout << "Opening training File \"" << workingDirectory + trainingFile << "\"" << endl;
 	//try to open the trainingFile
 	ifstream TF(workingDirectory + trainingFile);
-
 	if (!TF.is_open())
 	{
 		cerr << "Failed to open trainingFile! (" << workingDirectory + trainingFile << ")" << endl;
@@ -223,6 +235,8 @@ bool FeatherIdentifier::MakeTrainingSets(const string &trainingFile, ExtractType
 			TF.close();
 			return false;
 		}
+
+		cout << "Training Set: " << methodStr << ", " << numWords << " words" << endl;
 	}
 	else
 	{
@@ -230,9 +244,16 @@ bool FeatherIdentifier::MakeTrainingSets(const string &trainingFile, ExtractType
 		return false;
 	}
 
+	
+
 	int label = 0;
 	while (getline(TF, line))
 	{
+		if (line[0] == '#')			//comment
+		{
+			continue;
+		}
+
 		ImageSet TS;
 		string name;
 		int qty;
@@ -272,29 +293,13 @@ bool FeatherIdentifier::MakeTestingSets(const string &testingFile)
 	//<SIFT>
 	string line;
 	stringstream ss;
-	if (getline(TF, line))
-	{
-		string methodStr;
-
-		ss << line;
-		ss >> methodStr;
-
-		//convert the methodString into
-		if (!ExtractTypeFromString(methodStr, eType))
-		{
-			cerr << "Invalid Extract type!" << endl;
-			return false;
-		}
-	}
-	else
-	{
-		TF.close();
-		return false;
-	}
 
 	int label = 0;
 	while (getline(TF, line))
 	{
+		if (line[0] == '#')			//comment
+			continue;
+
 		ImageSet TS;
 		string name;
 		int qty;
@@ -352,8 +357,6 @@ bool FeatherIdentifier::CreateVocabulary(Ptr<FeatureDetector> &detector, Ptr<Des
 		return false;
 	}
 
-	cout << "nwords: " << numWords << endl;
-
 	//make the correct descriptors material for this extractor
 	Mat trainingDescriptors(1, extractor->descriptorSize(), extractor->descriptorType());
 
@@ -366,7 +369,7 @@ bool FeatherIdentifier::CreateVocabulary(Ptr<FeatureDetector> &detector, Ptr<Des
 			//first get the keypoints
 			vector<KeyPoint> keypoints;
 			detector->detect(trainingSets[set].images[im], keypoints);
-
+			KeyPointsFilter::retainBest(keypoints, MAX_KEYPOINTS);
 			
 			if (!keypoints.empty())
 			{
@@ -374,7 +377,7 @@ bool FeatherIdentifier::CreateVocabulary(Ptr<FeatureDetector> &detector, Ptr<Des
 				//save a record of the keypoint image
 				if (im == 0)
 				{
-					cout << "making keypoint image" << endl;
+					//cout << "making keypoint image" << endl;
 					//make a keypoint image
 					Mat keypointImg;
 					drawKeypoints(trainingSets[set].images[im], keypoints, keypointImg, Scalar(-1), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
@@ -443,6 +446,8 @@ bool FeatherIdentifier::CalculateHistograms(Ptr<FeatureDetector> &detector, Ptr<
 		{
 			vector<KeyPoint> keypoints;
 			detector->detect(trainingSets[set].images[im], keypoints);
+			KeyPointsFilter::retainBest(keypoints, MAX_KEYPOINTS);
+			
 
 			if (!keypoints.empty())
 			{
@@ -473,7 +478,7 @@ bool FeatherIdentifier::CalculateHistograms(Ptr<FeatureDetector> &detector, Ptr<
 			}
 		}
 
-		cout << "Added " << trainingSets[set].images.size() << " " << trainingSets[set].name << " samples" << endl;
+		//cout << "Added " << trainingSets[set].images.size() << " " << trainingSets[set].name << " samples" << endl;
 	}
 
 	if (samples.empty() || outLabels.empty())
