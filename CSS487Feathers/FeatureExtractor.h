@@ -12,11 +12,7 @@ using namespace std;
 
 using namespace cv;
 using namespace cv::xfeatures2d;
-/*
-FeatureExtractor
-This class allows the user to retrieve any
-descriptor or extractor we add
-*/
+
 
 //Extraction methods
 typedef enum
@@ -26,9 +22,15 @@ typedef enum
 	E_SURF
 } ExtractType;
 
-bool ExtractTypeFromString(const string &str, ExtractType &type);
-string StringFromExtractType(ExtractType type);
+bool StringToExtractType(const string &str, ExtractType &type);
+string ExtractTypeToString(ExtractType type);
 
+/*
+FeatureExtractor
+This class allows the user to retrieve a
+FeatureDetector or DescriptorExtractor that they need
+based on an ExtractType value
+*/
 class FeatureExtractor
 {
 public:

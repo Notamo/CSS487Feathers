@@ -17,9 +17,12 @@ using namespace cv::ml;
 
 const string saveDir = "SAVED/";
 
-//A Class to help separate the more Data building
-//and file I/O
-//related functions from the rest of the program
+/*
+BOWDataMgmt
+A class to help separate the more data building
+and file I/O related functions from the reso of
+the program
+*/
 class BOWDataMgmt
 {
 public:

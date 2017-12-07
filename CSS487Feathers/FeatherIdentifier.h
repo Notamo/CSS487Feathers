@@ -20,6 +20,11 @@ using namespace cv::ml;
 #include "FeatureExtractor.h"
 #include "BOWDataMgmt.h"
 
+/*
+FeatherIdentifier
+A Class for Identifying Feathers using
+Bag of Words and a Scaled Vector Machine
+*/
 class FeatherIdentifier : public BOWDataMgmt
 {
 public:
@@ -48,7 +53,7 @@ private:
 	vector<ImageSet> trainingSets;
 	vector<ImageSet> testingSets;
 
-	bool CreateVocabulary(Ptr<FeatureDetector> &FD, Ptr<DescriptorExtractor> &DE);
+	bool CreateDictionary(Ptr<FeatureDetector> &FD, Ptr<DescriptorExtractor> &DE);
 	bool CalculateHistograms(Ptr<FeatureDetector> &FD, Ptr<DescriptorExtractor> &DE, Mat &outSamples, Mat &outLabels);
 	bool TrainSVM(const Mat &samples, const Mat &labels);
 	bool TestSVM(ExtractType eType, Ptr<FeatureDetector> &FD, Ptr<DescriptorExtractor> &DE, vector<ImageSet> &trainingSets, vector<ImageSet> &testingSets, bool verbose);

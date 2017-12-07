@@ -1,6 +1,12 @@
 #include "FeatureExtractor.h"
 
 
+/*
+FeatureExtractor() - Constructor
+Precondition: No FeatureExtractor object
+Postcondition: FeatureExtractor is created, and
+	sift and surf member objects are initialized
+*/
 FeatureExtractor::FeatureExtractor()
 {
 	sift = SIFT::create();
@@ -12,6 +18,13 @@ FeatureExtractor::~FeatureExtractor()
 {
 }
 
+/*
+GetFD - Get a FeatureDetector
+Precondition: caller provides an ExtractType type 
+	and a reference to a Ptr<FeatureDetector> &FD
+Postcondition: returns success state, and FD is set
+	to the FeatureDetector indicated by type
+*/
 bool FeatureExtractor::GetFD(ExtractType type, Ptr<FeatureDetector> &FD)
 {
 	switch (type)
@@ -31,6 +44,13 @@ bool FeatureExtractor::GetFD(ExtractType type, Ptr<FeatureDetector> &FD)
 	return false;
 }
 
+/*
+GetDE - Get a DescriptorExtractor
+Precondition: caller provides an ExtractType type
+	and a reference to a Ptr<FeatureDetector> &FD
+Postcondition: returns success state, and FD is set
+	to the DescriptorExtractor indicated by type
+*/
 bool FeatureExtractor::GetDE(ExtractType type, Ptr<DescriptorExtractor> &DE)
 {
 	switch (type)
@@ -50,7 +70,14 @@ bool FeatureExtractor::GetDE(ExtractType type, Ptr<DescriptorExtractor> &DE)
 	return false;
 }
 
-bool ExtractTypeFromString(const string &str, ExtractType &type)
+/*
+StringToExtractType
+Precondition: caller provides a string and a reference
+	to an ExtractType &type
+Postcondition: returns success state, type is set to
+	the extract type indicated by str
+*/
+bool StringToExtractType(const string &str, ExtractType &type)
 {
 	if (str == "SIFT")
 	{
@@ -66,7 +93,14 @@ bool ExtractTypeFromString(const string &str, ExtractType &type)
 	return true;
 }
 
-string StringFromExtractType(ExtractType type)
+/*
+ExtractTypeToString
+Precondition: caller provides the extractor type
+	desired
+Postcondition: returns the ExtractType indicated
+	as a string
+*/
+string ExtractTypeToString(ExtractType type)
 {
 	switch (type)
 	{
