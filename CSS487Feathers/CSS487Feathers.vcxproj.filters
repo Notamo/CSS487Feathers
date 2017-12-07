@@ -13,12 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\HoNC">
-      <UniqueIdentifier>{3575f470-7864-4cd8-8bd2-c91167c9e697}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\HoNC">
-      <UniqueIdentifier>{80e48084-2b8e-4508-ae3f-b876554003e7}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FeatureExtractor.cpp">
@@ -27,16 +21,10 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HoNC\HoNC.cpp">
-      <Filter>Source Files\HoNC</Filter>
-    </ClCompile>
-    <ClCompile Include="HoNC\HoWH.cpp">
-      <Filter>Source Files\HoNC</Filter>
-    </ClCompile>
-    <ClCompile Include="HoNC\VanillaSIFT.cpp">
-      <Filter>Source Files\HoNC</Filter>
-    </ClCompile>
     <ClCompile Include="FeatherIdentifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BOWDataMgmt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,28 +32,13 @@
     <ClInclude Include="FeatureExtractor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Feature Detection\HoNC.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Feature Detection\HoWH.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Feature Detection\VanillaSIFT.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="HoNC\HoNC.h">
-      <Filter>Header Files\HoNC</Filter>
-    </ClInclude>
-    <ClInclude Include="HoNC\HoWH.h">
-      <Filter>Header Files\HoNC</Filter>
-    </ClInclude>
-    <ClInclude Include="HoNC\VanillaSIFT.h">
-      <Filter>Header Files\HoNC</Filter>
-    </ClInclude>
     <ClInclude Include="FeatherIDUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FeatherIdentifier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BOWDataMgmt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

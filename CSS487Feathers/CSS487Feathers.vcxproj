@@ -19,23 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BOWDataMgmt.cpp" />
     <ClCompile Include="FeatherIdentifier.cpp" />
     <ClCompile Include="FeatureExtractor.cpp" />
-    <ClCompile Include="HoNC\HoNC.cpp" />
-    <ClCompile Include="HoNC\HoWH.cpp" />
-    <ClCompile Include="HoNC\VanillaSIFT.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BOWDataMgmt.h" />
     <ClInclude Include="FeatherIdentifier.h" />
     <ClInclude Include="FeatherIDUtil.h" />
     <ClInclude Include="FeatureExtractor.h" />
-    <ClInclude Include="HoNC\HoNC.h" />
-    <ClInclude Include="HoNC\HoWH.h" />
-    <ClInclude Include="HoNC\VanillaSIFT.h" />
-    <ClInclude Include="src\Feature Detection\HoNC.h" />
-    <ClInclude Include="src\Feature Detection\HoWH.h" />
-    <ClInclude Include="src\Feature Detection\VanillaSIFT.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{71DF4570-15C3-440F-8CDB-9A5BE31D6BB6}</ProjectGuid>

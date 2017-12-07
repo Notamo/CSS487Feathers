@@ -5,127 +5,11 @@ FeatureExtractor::FeatureExtractor()
 {
 	sift = SIFT::create();
 	surf = SURF::create();
-	honc = HoNC::create();
 }
 
 
 FeatureExtractor::~FeatureExtractor()
 {
-}
-
-void FeatureExtractor::Detect(ExtractType type, const Mat& img, vector<KeyPoint> &keypoints)
-{
-	switch (type)
-	{
-		case ExtractType::E_SIFT:
-		{
-			DetectSIFT(img, keypoints);
-			break;
-		}
-		case ExtractType::E_SURF:
-		{
-			DetectSURF(img, keypoints);
-			break;
-		}
-		case ExtractType::E_HoNC:
-		{
-			DetectHoNC(img, keypoints);
-			break;
-		}
-	}
-}
-
-void FeatureExtractor::Compute(ExtractType type, const Mat& img, vector<KeyPoint> &keypoints, Mat &descriptors)
-{
-	switch (type)
-	{
-		case ExtractType::E_SIFT:
-		{
-			ComputeSIFT(img, keypoints, descriptors);
-			break;
-		}
-		case ExtractType::E_SURF:
-		{
-			ComputeSURF(img, keypoints, descriptors);
-			break;
-		}
-		case ExtractType::E_HoNC:
-		{
-			ComputeHoNC(img, keypoints, descriptors);
-			break;
-		}
-	}
-}
-
-//extract features based on the algorithm chosen
-//later we might even combine them
-void FeatureExtractor::ExtractFeatures(ExtractType type, const Mat& img, vector<KeyPoint> &keypoints, Mat &descriptors)
-{
-	switch (type)
-	{
-		case ExtractType::E_SIFT:
-		{
-			DetectSIFT(img, keypoints);
-			ComputeSIFT(img, keypoints, descriptors);
-			break;
-		}
-		case ExtractType::E_SURF:
-		{
-			DetectSURF(img, keypoints);
-			ComputeSURF(img, keypoints, descriptors);
-			break;
-		}
-		case ExtractType::E_HoNC:
-		{
-			DetectHoNC(img, keypoints);
-			ComputeHoNC(img, keypoints, descriptors);
-			break;
-		}
-	}
-}
-
-void FeatureExtractor::DetectSIFT(const Mat &img, vector<KeyPoint> &keypoints)
-{
-	Mat greyImg;
-	cvtColor(img, greyImg, COLOR_BGR2GRAY);
-
-	sift->detect(img, keypoints);
-}
-
-void FeatureExtractor::DetectSURF(const Mat &img, vector<KeyPoint> &keypoints)
-{
-	Mat greyImg;
-	cvtColor(img, greyImg, COLOR_BGR2GRAY);
-
-	surf->detect(img, keypoints);
-}
-
-void FeatureExtractor::DetectHoNC(const Mat &img, vector<KeyPoint> &keypoints)
-{
-	(*honc)(img, noArray(), keypoints, noArray(), false);
-}
-
-
-
-void FeatureExtractor::ComputeSIFT(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors)
-{
-	Mat greyImg;
-	cvtColor(img, greyImg, COLOR_BGR2GRAY);
-
-	sift->compute(greyImg, keypoints, descriptors);
-}
-
-void FeatureExtractor::ComputeSURF(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors)
-{
-	Mat greyImg;
-	cvtColor(img, greyImg, COLOR_BGR2GRAY);
-
-	surf->compute(greyImg, keypoints, descriptors);
-}
-
-void FeatureExtractor::ComputeHoNC(const Mat &img, vector<KeyPoint> &keypoints, Mat &descriptors)
-{
-	(*honc)(img, noArray(), keypoints, descriptors, false);
 }
 
 bool FeatureExtractor::GetFD(ExtractType type, Ptr<FeatureDetector> &FD)
@@ -140,11 +24,6 @@ bool FeatureExtractor::GetFD(ExtractType type, Ptr<FeatureDetector> &FD)
 		case ExtractType::E_SURF:
 		{
 			FD = surf;
-			return true;
-		}
-		case ExtractType::E_HoNC:
-		{
-			FD = honc;
 			return true;
 		}
 	}
@@ -166,11 +45,6 @@ bool FeatureExtractor::GetDE(ExtractType type, Ptr<DescriptorExtractor> &DE)
 			DE = surf;
 			return true;
 		}
-		case ExtractType::E_HoNC:
-		{
-			DE = honc;
-			return true;
-		}
 	}
 
 	return false;
@@ -186,14 +60,8 @@ bool ExtractTypeFromString(const string &str, ExtractType &type)
 	{
 		type = ExtractType::E_SURF;
 	}
-	else if (str == "HoNC")
-	{
-		type = ExtractType::E_HoNC;
-	}
 	else
-	{
 		return false;
-	}
 
 	return true;
 }
@@ -206,9 +74,9 @@ string StringFromExtractType(ExtractType type)
 		return "SIFT";
 	case ExtractType::E_SURF:
 		return "SURF";
-	case ExtractType::E_HoNC:
-		return "HoNC";
 	case ExtractType::E_None:
 		return "NONE";
+	default:
+		return "ERROR";
 	}
 }

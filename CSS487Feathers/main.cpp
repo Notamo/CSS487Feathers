@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 			return -1;
 		}
 
-		if (!FeatherID.Identify(file2, false, false))
+		if (!FeatherID.Identify(file2, false))
 		{
 			cerr << "Identification Failed!" << endl;
 			system("pause");
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 		}
 
 
-		if (!FeatherID.Identify(file2, false, false))
+		if (!FeatherID.Identify(file2, false))
 		{
 			cerr << "Identification Failed!" << endl;
 			system("pause");

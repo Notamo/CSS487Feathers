@@ -1,0 +1,5 @@
+SIFT	1000
+car			60 		TRAIN/NOT_FEATHERS/cars/
+motorcycle	60		TRAIN/NOT_FEATHERS/motorcycles/
+plane		60		TRAIN/NOT_FEATHERS/planes/
+tiger		60		TRAIN/NOT_FEATHERS/tigers/
